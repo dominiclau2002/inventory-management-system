@@ -1,0 +1,35 @@
+# Environment files
+.env
+config/production.php
+
+# Database files
+*.sql
+database/backups/
+database/dumps/
+
+# User uploads
+uploads/user_data/
+uploads/confidential/
+
+# Logs
+logs/
+*.log
+error.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp/
+tmp/
+cache/
+
+# Production configuration
+config/prod_db.php
