@@ -1,6 +1,6 @@
-# BookHive
+# BookHive - Inventory Management System
 
-A simple library management system built with PHP and MySQL. Helps you keep track of books, users, and borrowings with an easy-to-use interface.
+A simple inventory management system built with PHP and MySQL. Helps you keep track of items, users, and borrowings with an easy-to-use interface.
 
 ## Getting Started
 
@@ -12,7 +12,7 @@ You'll need:
 1. Drop the files into your XAMPP's htdocs folder
 2. Fire up Apache and MySQL in XAMPP
 3. Visit `http://localhost/index.php`
-4. The database will set itself up with some sample books on start
+4. The database will set itself up with some sample items on start
 
 Credentials for the admin account:
 - Username: `admin`
@@ -21,18 +21,18 @@ Credentials for the admin account:
 ## What Can You Do?
 
 ### Regular Users Can:
-- Find books using the search bar
-- See all the details about a book
-- Borrow books for 30 days
-- Keep track of when books are due
+- Find items using the search bar
+- See all the details about an item
+- Borrow items for 30 days
+- Keep track of when items are due
 - Check their borrowing history
 
 ### Admins Can:
-- Add, edit, or remove books
+- Add, edit, or remove items
 - See who's borrowed what
 - Handle borrows and returns
 - Manage user accounts
-- Check the whole library's history
+- Check the whole inventory history
 
 ## Technologies used in the project
 
@@ -49,19 +49,19 @@ Credentials for the admin account:
 
 ### Database Layout:
 - `users` table: user informations (id, full name, username, hashed password, role and when was it created)
-- `books` table: book informations (id, title, author, isbn number, publisher, year, language, description, status and when was it created)
-- `borrows` table: borrow informations (borrow id, book id, user id, borrow and return date, the date when the book was actually returned and the current borrowing status)
+- `books` table: item informations (id, title, author, isbn number, publisher, year, language, description, status and when was it created)
+- `borrows` table: borrow informations (borrow id, item id, user id, borrow and return date, the date when the item was actually returned and the current borrowing status)
 
 ## How to Use It
 
 ### If You're a User:
-1. Sign up through "Regisztráció"
-2. Find something to read
-3. Hit "Kölcsönzés" to borrow it
-4. Check "Kölcsönzéseim" to see your books
+1. Sign up through "Register"
+2. Find items to borrow
+3. Hit "Borrow" to borrow it
+4. Check "My Borrowings" to see your items
 
 ### If You're an Admin:
-1. Books:
+1. Items:
    - Add new ones
    - Fix details
    - Remove old ones
@@ -80,7 +80,7 @@ Credentials for the admin account:
 ## Additional Information
 - Keep XAMPP updated
 - What does the system handle:
-  - Checking if books are available
+  - Checking if items are available
   - Setting due dates
   - Making sure you're logged in
   - Keeping track of who can do what
