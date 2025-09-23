@@ -1,4 +1,6 @@
 <?php
+// Include configuration
+require_once dirname(__DIR__) . '/config/config.php';
 
 $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
 ?>
@@ -7,16 +9,16 @@ $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($page_title) ? $page_title . " - " : ""; ?>BookHive</title>
+    <title><?php echo isset($page_title) ? $page_title . " - " : ""; ?><?php echo APP_SHORT_NAME; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="/assets/css/style.css" rel="stylesheet">
+    <link href="<?php echo asset('css/style.css'); ?>" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="/index.php">
-                <i class="fas fa-book-reader me-2"></i>BookHive
+            <a class="navbar-brand" href="<?php echo url('index.php'); ?>">
+                <i class="fas fa-book-reader me-2"></i><?php echo APP_SHORT_NAME; ?>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -24,31 +26,36 @@ $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'home' ? 'active' : ''; ?>" href="/index.php">
+                        <a class="nav-link <?php echo $current_page === 'home' ? 'active' : ''; ?>" href="<?php echo url('index.php'); ?>">
                             <i class="fas fa-home me-1"></i>Home
                         </a>
                     </li>
                     <?php if($is_logged_in): ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'books' ? 'active' : ''; ?>" href="/books/books.php">
-                            <i class="fas fa-book me-1"></i>Books
+                        <a class="nav-link <?php echo $current_page === 'books' ? 'active' : ''; ?>" href="<?php echo url('books/books.php'); ?>">
+                            <i class="fas fa-book me-1"></i>Products
                         </a>
                     </li>
                     <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'borrows' ? 'active' : ''; ?>" href="/books/borrows/borrow.php">
-                            <i class="fas fa-clipboard-list me-1"></i>Borrowings
+                        <a class="nav-link <?php echo $current_page === 'borrows' ? 'active' : ''; ?>" href="<?php echo url('books/borrows/borrow.php'); ?>">
+                            <i class="fas fa-clipboard-list me-1"></i>Loans
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'users' ? 'active' : ''; ?>" href="/admin/users.php">
+                        <a class="nav-link <?php echo $current_page === 'users' ? 'active' : ''; ?>" href="<?php echo url('admin/users.php'); ?>">
                             <i class="fas fa-users me-1"></i>Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo $current_page === 'users' ? 'active' : ''; ?>" href="<?php echo url('admin/dashboard.php'); ?>">
+                            <i class="fas fa-line-chart me-1"></i>Dashboard
                         </a>
                     </li>
                     <?php else: ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'my_borrows' ? 'active' : ''; ?>" href="/books/borrows/my_borrows.php">
-                            <i class="fas fa-clipboard-list me-1"></i>My Borrowings
+                        <a class="nav-link <?php echo $current_page === 'my_borrows' ? 'active' : ''; ?>" href="<?php echo url('books/borrows/my_borrows.php'); ?>">
+                            <i class="fas fa-clipboard-list me-1"></i>My Loans
                         </a>
                     </li>
                     <?php endif; ?>
@@ -62,7 +69,7 @@ $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="/auth/logout.php">
+                                <a class="dropdown-item" href="<?php echo url('auth/logout.php'); ?>">
                                     <i class="fas fa-sign-out-alt me-1"></i>Logout
                                 </a>
                             </li>
@@ -70,12 +77,12 @@ $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
                     </li>
                     <?php else: ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'login' ? 'active' : ''; ?>" href="/auth/login.php">
+                        <a class="nav-link <?php echo $current_page === 'login' ? 'active' : ''; ?>" href="<?php echo url('auth/login.php'); ?>">
                             <i class="fas fa-sign-in-alt me-1"></i>Login
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'register' ? 'active' : ''; ?>" href="/auth/register.php">
+                        <a class="nav-link <?php echo $current_page === 'register' ? 'active' : ''; ?>" href="<?php echo url('auth/register.php'); ?>">
                             <i class="fas fa-user-plus me-1"></i>Register
                         </a>
                     </li>

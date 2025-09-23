@@ -9,6 +9,7 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
     exit;
 }
 
+// Import database configuration and connection string
 require_once "../config/db.php";
 
 $username = $password = $confirm_password = $name = "";
@@ -73,8 +74,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty($username_err) && empty($password_err) && empty($confirm_password_err) && empty($name_err)){
         $sql = "INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, 'user')";
          
-        if($stmt = mysqli_prepare($conn, $sql)){
+        if($stmt = mysqli_prepare($conn, $sql)){ // Bind variables to the prepared statement as parameters
             mysqli_stmt_bind_param($stmt, "sss", $param_username, $param_password, $param_name);
+         
             
             $param_username = $username;
             $param_password = password_hash($password, PASSWORD_DEFAULT);

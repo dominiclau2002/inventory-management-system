@@ -33,3 +33,5 @@ cache/
 
 # Production configuration
 config/prod_db.php
+
+*.md

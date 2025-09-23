@@ -14,7 +14,7 @@ require_once "../config/db.php";
 // Process delete operation
 if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
     // Check if the book has active borrows
-    $sql = "SELECT COUNT(*) as active_borrows FROM borrows WHERE book_id = ? AND actual_return_date IS NULL";
+    $sql = "SELECT COUNT(*) as active_borrows FROM borrows WHERE product_id = ? AND actual_return_date IS NULL";
     
     if($stmt = mysqli_prepare($conn, $sql)){
         mysqli_stmt_bind_param($stmt, "i", $param_id);
@@ -25,7 +25,7 @@ if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
             $row = mysqli_fetch_array($result);
             
             if($row["active_borrows"] > 0){
-                $_SESSION["error_message"] = "The book cannot be deleted because it has active borrowings.";
+                $_SESSION["error_message"] = "The product cannot be deleted because it has active borrowings.";
                 header("location: ../books/books.php");
                 exit();
             }
@@ -34,13 +34,13 @@ if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
     }
     
     // Prepare a delete statement
-    $sql = "DELETE FROM books WHERE id = ?";
+    $sql = "DELETE FROM products WHERE id = ?";
     
     if($stmt = mysqli_prepare($conn, $sql)){
         mysqli_stmt_bind_param($stmt, "i", $param_id);
         
         if(mysqli_stmt_execute($stmt)){
-            $_SESSION["success_message"] = "Book successfully deleted.";
+            $_SESSION["success_message"] = "Product successfully deleted.";
             header("location: ../books/books.php");
             exit();
         } else{

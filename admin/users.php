@@ -10,24 +10,23 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION[
 }
 
 require_once "../config/db.php";
-require_once "../includes/header.php";
 
 // Process role change
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["user_id"]) && isset($_POST["new_role"])){
     $sql = "UPDATE users SET role = ? WHERE id = ?";
-    
+
     if($stmt = mysqli_prepare($conn, $sql)){
         mysqli_stmt_bind_param($stmt, "si", $param_role, $param_id);
-        
+
         $param_role = $_POST["new_role"];
         $param_id = $_POST["user_id"];
-        
+
         if(mysqli_stmt_execute($stmt)){
             $_SESSION["success_message"] = "User role successfully changed.";
         } else{
             $_SESSION["error_message"] = "An error occurred while changing the role.";
         }
-        
+
         mysqli_stmt_close($stmt);
     }
 }
@@ -42,6 +41,8 @@ if($result = mysqli_query($conn, $sql)){
 }
 
 mysqli_close($conn);
+
+require_once "../includes/header.php";
 ?>
 
 <div class="card">

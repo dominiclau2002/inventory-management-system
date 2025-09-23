@@ -1,17 +1,20 @@
 <?php
 session_start();
+$current_page = 'home';
+$page_title = 'Home';
 
 require_once "config/db.php";
 
 $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
 
-// Get user's borrowed books if logged in
-$borrowed_books = array();
+// Get user's borrowed products if logged in
+$borrowed_products = array();
 if($is_logged_in && isset($_SESSION["id"])) {
-    $sql = "SELECT books.*, borrows.borrow_date, borrows.return_date 
-            FROM books 
-            INNER JOIN borrows ON books.id = borrows.book_id 
-            WHERE borrows.user_id = ? AND borrows.actual_return_date IS NULL 
+    $sql = "SELECT products.*, borrows.borrow_date, borrows.return_date, users.username as borrower_username
+            FROM products
+            INNER JOIN borrows ON products.id = borrows.product_id
+            INNER JOIN users ON borrows.user_id = users.id
+            WHERE borrows.user_id = ? AND borrows.actual_return_date IS NULL
             ORDER BY borrows.borrow_date DESC";
     
     if($stmt = mysqli_prepare($conn, $sql)){
@@ -21,16 +24,16 @@ if($is_logged_in && isset($_SESSION["id"])) {
             $result = mysqli_stmt_get_result($stmt);
             
             while($row = mysqli_fetch_array($result)){
-                $borrowed_books[] = $row;
+                $borrowed_products[] = $row;
             }
         }
         mysqli_stmt_close($stmt);
     }
 }
 
-// Get latest books
-$latest_books = array();
-$sql = "SELECT * FROM books ORDER BY created_at DESC LIMIT ?";
+// Get latest products
+$latest_products = array();
+$sql = "SELECT * FROM products ORDER BY created_at DESC LIMIT ?";
 if($stmt = mysqli_prepare($conn, $sql)){
     mysqli_stmt_bind_param($stmt, "i", $limit);
     $limit = 5;
@@ -38,99 +41,18 @@ if($stmt = mysqli_prepare($conn, $sql)){
     if(mysqli_stmt_execute($stmt)){
         $result = mysqli_stmt_get_result($stmt);
         while($row = mysqli_fetch_array($result)){
-            $latest_books[] = $row;
+            $latest_products[] = $row;
         }
     }
     mysqli_stmt_close($stmt);
 }
 
 mysqli_close($conn);
+
+// Set a flag to indicate this is the root level
+$is_root_level = true;
+require_once "includes/header.php";
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookHive</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="../index.php">
-                <i class="fas fa-book-reader me-2"></i>BookHive
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="../index.php">
-                            <i class="fas fa-home me-1"></i>Home
-                        </a>
-                    </li>
-                    <?php if($is_logged_in): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="books/books.php">
-                            <i class="fas fa-book me-1"></i>Books
-                        </a>
-                    </li>
-                    <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="books/borrows/borrow.php">
-                            <i class="fas fa-clipboard-list me-1"></i>Borrowings
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/users.php">
-                            <i class="fas fa-users me-1"></i>Users
-                        </a>
-                    </li>
-                    <?php else: ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="books/borrows/my_borrows.php">
-                            <i class="fas fa-clipboard-list me-1"></i>My Borrowings
-                        </a>
-                    </li>
-                    <?php endif; ?>
-                    <?php endif; ?>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <?php if($is_logged_in): ?>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-1"></i><?php echo htmlspecialchars($_SESSION["name"]); ?>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="auth/logout.php">
-                                    <i class="fas fa-sign-out-alt me-1"></i>Logout
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <?php else: ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="auth/login.php">
-                            <i class="fas fa-sign-in-alt me-1"></i>Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="auth/register.php">
-                            <i class="fas fa-user-plus me-1"></i>Register
-                        </a>
-                    </li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
         <?php if(!$is_logged_in): ?>
         <div class="row mb-4">
             <div class="col-12">
@@ -138,9 +60,9 @@ mysqli_close($conn);
                     <div class="card-body text-center">
                         <h1 class="display-4 mb-4">
                             <i class="fas fa-book-open text-primary me-3"></i>
-                            Welcome to BookHive!
+                            Welcome to CA-APS Inventory Management System!
                         </h1>
-                        <p class="lead mb-4">Browse our books and manage your borrowings online.</p>
+                        <p class="lead mb-4">Browse our inventory and manage your borrowings here.</p>
                         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                             <a href="auth/login.php" class="btn btn-primary btn-lg px-4 gap-3" data-tooltip="Sign in to your account">
                                 <i class="fas fa-sign-in-alt me-2"></i>Sign In
@@ -160,31 +82,48 @@ mysqli_close($conn);
                 <div class="card mb-4">
                     <div class="card-header">
                         <h4 class="mb-0">
-                            <i class="fas fa-clock me-2"></i>Latest Books
+                            <i class="fas fa-clock me-2"></i>Latest Products
                         </h4>
                     </div>
                     <div class="card-body">
-                        <?php if(empty($latest_books)): ?>
-                            <p class="text-muted mb-0">Currently no books in the system.</p>
+                        <?php if(empty($latest_products)): ?>
+                            <p class="text-muted mb-0">Currently no products in the system.</p>
                         <?php else: ?>
                             <div class="row">
-                                <?php foreach($latest_books as $book): ?>
+                                <?php foreach($latest_products as $product): ?>
                                     <div class="col-md-6 mb-3">
                                         <div class="card h-100">
                                             <div class="card-body">
                                                 <h5 class="card-title">
-                                                    <i class="fas fa-book me-2"></i><?php echo htmlspecialchars($book["title"]); ?>
+                                                    <i class="fas fa-box me-2"></i><?php echo htmlspecialchars($product["product_name"]); ?>
                                                 </h5>
                                                 <p class="card-text">
                                                     <small class="text-muted">
-                                                        <i class="fas fa-user me-1"></i>Author: <?php echo htmlspecialchars($book["author"]); ?>
+                                                        <i class="fas fa-tag me-1"></i>Category: <?php echo htmlspecialchars($product["category"]); ?>
                                                     </small>
                                                 </p>
                                                 <p class="card-text">
-                                                    <?php echo htmlspecialchars(substr($book["description"], 0, 100)) . "..."; ?>
+                                                    <?php echo htmlspecialchars("Description: ". substr($product["description"], 0, 100)); ?>
                                                 </p>
+                                                <p class="card-text">
+                                                    <?php if(!empty($product["serial_number"])): ?>
+                                                        Serial Number: <?php echo htmlspecialchars($product["serial_number"]); ?>
+                                                    <?php else: ?>
+                                                        Alt. Serial Number: <?php echo htmlspecialchars($product["alt_serial_number"]); ?>
+                                                    <?php endif; ?>
+                                                </p>
+
+                                                <p class="card-text">
+                                                    <?php echo htmlspecialchars("Prototype Version: " . substr($product["prototype_version"], 0, 100)); ?>
+                                                </p>
+
+                                                <p class="card-text">
+                                                    <?php echo htmlspecialchars("Main Owner: " . substr($product["main_owner"], 0, 100)); ?>
+                                                </p>
+
+                                                
                                                 <?php if($is_logged_in): ?>
-                                                <a href="books/view_book.php?id=<?php echo $book["id"]; ?>" class="btn btn-primary btn-sm">
+                                                <a href="books/view_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-info-circle me-1"></i>Details
                                                 </a>
                                                 <?php else: ?>
@@ -206,28 +145,34 @@ mysqli_close($conn);
                 <div class="card">
                     <div class="card-header">
                         <h4 class="mb-0">
-                            <i class="fas fa-book-reader me-2"></i>My Borrowed Books
+                            <i class="fas fa-clipboard-list me-2"></i>My Borrowed Products
                         </h4>
                     </div>
                     <div class="card-body">
-                        <?php if(empty($borrowed_books)): ?>
-                            <p class="text-muted mb-0">You currently have no borrowed books.</p>
+                        <?php if(empty($borrowed_products)): ?>
+                            <p class="text-muted mb-0">You currently have no borrowed products.</p>
                         <?php else: ?>
                             <div class="list-group">
-                                <?php foreach($borrowed_books as $book): ?>
+                                <?php foreach($borrowed_products as $product): ?>
                                     <div class="list-group-item">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1"><?php echo htmlspecialchars($book["title"]); ?></h5>
+                                            <h5 class="mb-1"><?php echo htmlspecialchars($product["product_name"]); ?></h5>
                                             <small class="text-muted">
-                                                Due: <?php echo date("Y.m.d", strtotime($book["return_date"])); ?>
+                                                Due: <?php echo date("Y.m.d", strtotime($product["return_date"])); ?>
                                             </small>
                                         </div>
                                         <p class="mb-1">
                                             <small class="text-muted">
-                                                <i class="fas fa-user me-1"></i><?php echo htmlspecialchars($book["author"]); ?>
+                                                <i class="fas fa-user me-1"></i>Borrowed by: <?php echo htmlspecialchars($product["borrower_username"]); ?>
                                             </small>
                                         </p>
-                                        <a href="books/view_book.php?id=<?php echo $book["id"]; ?>" class="btn btn-primary btn-sm mt-2">
+                                        <p class="mb-1">
+                                            <small class="text-muted">
+                                                <i class="fas fa-user me-1"></i>Main Owner: <?php echo htmlspecialchars($product["main_owner"]); ?>
+                                            </small>
+                                        </p>
+
+                                        <a href="books/view_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-primary btn-sm mt-2">
                                             <i class="fas fa-info-circle me-1"></i>Details
                                         </a>
                                     </div>

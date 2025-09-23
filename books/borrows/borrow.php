@@ -1,21 +1,28 @@
 <?php
 session_start();
+require_once "../../config/config.php";
+
+$current_page = 'borrows';
+$page_title = 'Borrowings';
 
 // Check if the user is logged in
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
-    header("location: ../../auth/login.php");
+    header("location: " . url("auth/login.php"));
     exit;
 }
 
-// For non-admin users, only allow direct book borrowing
-if($_SESSION["role"] !== "admin" && !isset($_GET["book_id"])) {
-    header("location: ../../index.php");
+// For non-admin users, only allow direct product borrowing
+if($_SESSION["role"] !== "admin" && !isset($_GET["product_id"])) {
+    header("location: " . url("index.php"));
     exit;
 }
 
 require_once "../../config/db.php";
+require_once "../../includes/borrowing_table.php";
+require_once "../../includes/header.php";
 
-// Process return book
+
+// Process return product
 if(isset($_GET["return"]) && !empty($_GET["return"])){
     $sql = "UPDATE borrows SET actual_return_date = NOW() WHERE id = ?";
     
@@ -24,7 +31,7 @@ if(isset($_GET["return"]) && !empty($_GET["return"])){
         $param_id = $_GET["return"];
         
         if(mysqli_stmt_execute($stmt)){
-            header("location: books/borrows/borrow.php");
+            header("location: " . url("books/borrows/borrow.php"));
             exit();
         }
         mysqli_stmt_close($stmt);
@@ -33,17 +40,17 @@ if(isset($_GET["return"]) && !empty($_GET["return"])){
 
 // Process new borrow
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-    $book_id = $_POST["book_id"];
+    $product_id = $_POST["product_id"];
     $user_id = $_POST["user_id"];
     $return_date = $_POST["return_date"];
     
-    $sql = "INSERT INTO borrows (book_id, user_id, borrow_date, return_date) VALUES (?, ?, NOW(), ?)";
+    $sql = "INSERT INTO borrows (product_id, user_id, borrow_date, return_date) VALUES (?, ?, NOW(), ?)";
     
     if($stmt = mysqli_prepare($conn, $sql)){
-        mysqli_stmt_bind_param($stmt, "iis", $book_id, $user_id, $return_date);
+        mysqli_stmt_bind_param($stmt, "iis", $product_id, $user_id, $return_date);
         
         if(mysqli_stmt_execute($stmt)){
-            header("location: books/borrows/borrow.php");
+            header("location: " . url("books/borrows/borrow.php"));
             exit();
         }
         mysqli_stmt_close($stmt);
@@ -52,11 +59,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 // Get all active borrows
 $borrows = array();
-$sql = "SELECT borrows.*, books.title as book_title, users.name as user_name 
-        FROM borrows 
-        INNER JOIN books ON borrows.book_id = books.id 
-        INNER JOIN users ON borrows.user_id = users.id 
-        WHERE actual_return_date IS NULL 
+$sql = "SELECT borrows.*, products.product_name, users.name as user_name
+        FROM borrows
+        INNER JOIN products ON borrows.product_id = products.id
+        INNER JOIN users ON borrows.user_id = users.id
+        WHERE actual_return_date IS NULL
         ORDER BY borrow_date DESC";
 
 if($result = mysqli_query($conn, $sql)){
@@ -65,12 +72,12 @@ if($result = mysqli_query($conn, $sql)){
     }
 }
 
-// Get available books for new borrow
-$available_books = array();
-$sql = "SELECT id, title FROM books WHERE id NOT IN (SELECT book_id FROM borrows WHERE actual_return_date IS NULL)";
+// Get available products for new borrow
+$available_products = array();
+$sql = "SELECT id, product_name, category, serial_number, alt_serial_number FROM products WHERE id NOT IN (SELECT product_id FROM borrows WHERE actual_return_date IS NULL)";
 if($result = mysqli_query($conn, $sql)){
     while($row = mysqli_fetch_array($result)){
-        $available_books[] = $row;
+        $available_products[] = $row;
     }
 }
 
@@ -83,32 +90,32 @@ if($result = mysqli_query($conn, $sql)){
     }
 }
 
-// Handle direct book borrowing
-if(isset($_GET["book_id"]) && !empty($_GET["book_id"])) {
-    $book_id = $_GET["book_id"];
+// Handle direct product borrowing
+if(isset($_GET["product_id"]) && !empty($_GET["product_id"])) {
+    $product_id = $_GET["product_id"];
     $user_id = $_SESSION["id"];
     $return_date = date('Y-m-d', strtotime('+30 days'));
     
-    // Check if book is available
-    $sql = "SELECT status FROM books WHERE id = ?";
+    // Check if product is available
+    $sql = "SELECT status FROM products WHERE id = ?";
     if($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, "i", $book_id);
+        mysqli_stmt_bind_param($stmt, "i", $product_id);
         if(mysqli_stmt_execute($stmt)) {
             $result = mysqli_stmt_get_result($stmt);
             if($row = mysqli_fetch_array($result)) {
                 if($row["status"] == "available") {
                     // Insert borrow record
-                    $sql = "INSERT INTO borrows (book_id, user_id, borrow_date, return_date) VALUES (?, ?, NOW(), ?)";
+                    $sql = "INSERT INTO borrows (product_id, user_id, borrow_date, return_date) VALUES (?, ?, NOW(), ?)";
                     if($stmt = mysqli_prepare($conn, $sql)) {
-                        mysqli_stmt_bind_param($stmt, "iis", $book_id, $user_id, $return_date);
+                        mysqli_stmt_bind_param($stmt, "iis", $product_id, $user_id, $return_date);
                         if(mysqli_stmt_execute($stmt)) {
-                            // Update book status
-                            $sql = "UPDATE books SET status = 'borrowed' WHERE id = ?";
+                            // Update product status (main_owner stays unchanged)
+                            $sql = "UPDATE products SET status = 'borrowed' WHERE id = ?";
                             if($stmt = mysqli_prepare($conn, $sql)) {
-                                mysqli_stmt_bind_param($stmt, "i", $book_id);
+                                mysqli_stmt_bind_param($stmt, "i", $product_id);
                                 mysqli_stmt_execute($stmt);
                             }
-                            header("location: ../view_book.php?id=" . $book_id);
+                            header("location: " . url("books/view_book.php?id=" . $product_id));
                             exit();
                         }
                     }
@@ -116,131 +123,33 @@ if(isset($_GET["book_id"]) && !empty($_GET["book_id"])) {
             }
         }
     }
-    header("location: ../view_book.php?id=" . $book_id . "&error=1");
+    header("location: " . url("books/view_book.php?id=" . $product_id . "&error=1"));
     exit();
 }
 
 mysqli_close($conn);
+
+// Set flag for header path resolution
+$is_root_level = false;
+require_once "../../includes/header.php";
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrowings - BookHive</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="../../assets/css/style.css" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="../../index.php">
-                <i class="fas fa-book-reader me-2"></i>BookHive
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../../index.php">
-                            <i class="fas fa-home me-1"></i>Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../books.php">
-                            <i class="fas fa-book me-1"></i>Books
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="borrow.php">
-                            <i class="fas fa-clipboard-list me-1"></i>Borrowings
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../../admin/users.php">
-                            <i class="fas fa-users me-1"></i>Users
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-1"></i><?php echo htmlspecialchars($_SESSION["name"]); ?>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="../../auth/logout.php">
-                                    <i class="fas fa-sign-out-alt me-1"></i>Logout
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
         <div class="row">
             <div class="col-md-8">
                 <div class="card mb-4">
                     <div class="card-header">
                         <h4 class="mb-0">
-                            <i class="fas fa-clipboard-list me-2"></i>Active Borrowings
+                            <i class="fas fa-clipboard-list me-2"></i>Products on Loan
                         </h4>
                     </div>
                     <div class="card-body">
-                        <?php if(empty($borrows)): ?>
-                            <p class="text-muted mb-0">No active borrowings at the moment.</p>
-                        <?php else: ?>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Book</th>
-                                            <th>Borrower</th>
-                                            <th>Borrow Date</th>
-                                            <th>Due Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach($borrows as $borrow): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($borrow["book_title"]); ?></td>
-                                                <td><?php echo htmlspecialchars($borrow["user_name"]); ?></td>
-                                                <td><?php echo date("Y.m.d", strtotime($borrow["borrow_date"])); ?></td>
-                                                <td>
-                                                    <?php 
-                                                    $return_date = strtotime($borrow["return_date"]);
-                                                    $now = time();
-                                                    $days_left = round(($return_date - $now) / (60 * 60 * 24));
-                                                    
-                                                    if($days_left < 0) {
-                                                        echo '<span class="text-danger">';
-                                                        echo date("Y.m.d", $return_date);
-                                                        echo ' ('. abs($days_left) .' days overdue)';
-                                                        echo '</span>';
-                                                    } else {
-                                                        echo date("Y.m.d", $return_date);
-                                                        echo ' ('. $days_left .' days left)';
-                                                    }
-                                                    ?>
-                                                </td>
-                                                <td>
-                                                    <a href="../borrows/borrow.php?return=<?php echo $borrow["id"]; ?>" class="btn btn-success btn-sm" data-tooltip="Return book">
-                                                        <i class="fas fa-check me-1"></i>Return
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php endif; ?>
+                        <?php
+                        render_borrowing_table(
+                            $borrows,
+                            true, // Show borrower column (admin view)
+                            "borrow.php", // Return URL
+                            "No active borrowings at the moment."
+                        );
+                        ?>
                     </div>
                 </div>
             </div>
@@ -248,36 +157,48 @@ mysqli_close($conn);
                 <div class="card">
                     <div class="card-header">
                         <h4 class="mb-0">
-                            <i class="fas fa-plus me-2"></i>New Borrowing
+                            <i class="fas fa-plus me-2"></i>New Product Loan
                         </h4>
                     </div>
                     <div class="card-body">
-                        <?php if(empty($available_books)): ?>
+                        <?php if(empty($available_products)): ?>
                             <div class="alert alert-info" role="alert">
-                                <i class="fas fa-info-circle me-2"></i>No books available for borrowing at the moment.
+                                <i class="fas fa-info-circle me-2"></i>No products available for loan at the moment.
                             </div>
                         <?php elseif(empty($users)): ?>
                             <div class="alert alert-info" role="alert">
                                 <i class="fas fa-info-circle me-2"></i>No registered users.
                             </div>
                         <?php else: ?>
-                            <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                            <form method="POST" action="<?php echo url('books/borrows/borrow.php'); ?>">
                                 <div class="mb-3">
                                     <label class="form-label">
-                                        <i class="fas fa-book me-1"></i>Book
+                                        <i class="fas fa-box me-1"></i>Product
                                     </label>
-                                    <select name="book_id" class="form-select" required data-tooltip="Select the book you want to borrow">
-                                        <option value="">Select a book...</option>
-                                        <?php foreach($available_books as $book): ?>
-                                            <option value="<?php echo $book["id"]; ?>">
-                                                <?php echo htmlspecialchars($book["title"]); ?>
+                                    <select name="product_id" class="form-select" required data-tooltip="Select the product you want to borrow">
+                                        <option value="">Select a product...</option>
+                                        <?php foreach($available_products as $product): ?>
+                                            <option value="<?php echo $product["id"]; ?>">
+                                                <?php
+                                                echo htmlspecialchars($product["product_name"]);
+
+                                                // Display serial number if available
+                                                if (!empty($product["serial_number"])) {
+                                                    echo " - SN: " . htmlspecialchars($product["serial_number"]);
+                                                } elseif (!empty($product["alt_serial_number"])) {
+                                                    echo " - Alt SN: " . htmlspecialchars($product["alt_serial_number"]);
+                                                }
+
+                                                // Add category for additional context
+                                                echo " (" . htmlspecialchars($product["category"]) . ")";
+                                                ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">
-                                        <i class="fas fa-user me-1"></i>Borrower
+                                        <i class="fas fa-user me-1"></i>Loanee
                                     </label>
                                     <select name="user_id" class="form-select" required data-tooltip="Select the borrowing user">
                                         <option value="">Select a user...</option>
@@ -306,8 +227,5 @@ mysqli_close($conn);
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html> 
+<?php require_once "../../includes/footer.php"; ?> 
