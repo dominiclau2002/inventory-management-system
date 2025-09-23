@@ -1,7 +1,7 @@
 <?php
 session_start();
 $current_page = 'users';
-$page_title = 'Felhasználók kezelése';
+$page_title = 'User Management';
 
 // Check if the user is logged in and is admin
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["role"] !== "admin"){
@@ -23,9 +23,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["user_id"]) && isset($_P
         $param_id = $_POST["user_id"];
         
         if(mysqli_stmt_execute($stmt)){
-            $_SESSION["success_message"] = "A felhasználó szerepköre sikeresen módosítva.";
+            $_SESSION["success_message"] = "User role successfully changed.";
         } else{
-            $_SESSION["error_message"] = "Hiba történt a szerepkör módosítása során.";
+            $_SESSION["error_message"] = "An error occurred while changing the role.";
         }
         
         mysqli_stmt_close($stmt);
@@ -47,7 +47,7 @@ mysqli_close($conn);
 <div class="card">
     <div class="card-header">
         <h4 class="mb-0">
-            <i class="fas fa-users me-2"></i>Felhasználók kezelése
+            <i class="fas fa-users me-2"></i>User Management
         </h4>
     </div>
     <div class="card-body">
@@ -71,10 +71,10 @@ mysqli_close($conn);
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Név</th>
-                        <th>Felhasználónév</th>
-                        <th>Szerepkör</th>
-                        <th>Műveletek</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,20 +84,20 @@ mysqli_close($conn);
                             <td><?php echo htmlspecialchars($user["username"]); ?></td>
                             <td>
                                 <span class="badge <?php echo $user["role"] == "admin" ? "bg-danger" : "bg-primary"; ?>">
-                                    <?php echo $user["role"] == "admin" ? "Adminisztrátor" : "Felhasználó"; ?>
+                                    <?php echo $user["role"] == "admin" ? "Administrator" : "User"; ?>
                                 </span>
                             </td>
                             <td>
                                 <?php if($user["id"] != $_SESSION["id"]): ?>
                                 <div class="btn-group">
-                                    <form method="POST" class="d-inline" onsubmit="return confirm('Biztosan módosítja a felhasználó szerepkörét?');">
+                                    <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to change the user role?');">
                                         <input type="hidden" name="user_id" value="<?php echo $user["id"]; ?>">
                                         <input type="hidden" name="new_role" value="<?php echo $user["role"] == "admin" ? "user" : "admin"; ?>">
-                                        <button type="submit" class="btn btn-warning btn-sm" data-tooltip="Szerepkör módosítása">
+                                        <button type="submit" class="btn btn-warning btn-sm" data-tooltip="Change role">
                                             <i class="fas fa-exchange-alt"></i>
                                         </button>
                                     </form>
-                                    <a href="../admin/delete_user.php?id=<?php echo $user["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Biztosan törölni szeretné ezt a felhasználót?');" data-tooltip="Felhasználó törlése">
+                                    <a href="../admin/delete_user.php?id=<?php echo $user["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');" data-tooltip="Delete user">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>

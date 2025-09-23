@@ -1,7 +1,7 @@
 <?php
 session_start();
 $current_page = 'my_borrows';
-$page_title = 'Kölcsönzéseim';
+$page_title = 'My Borrowings';
 
 // Check if the user is logged in
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
@@ -83,22 +83,22 @@ mysqli_close($conn);
         <div class="card mb-4">
             <div class="card-header">
                 <h4 class="mb-0">
-                    <i class="fas fa-book me-2"></i>Jelenlegi kölcsönzéseim
+                    <i class="fas fa-book me-2"></i>My Current Borrowings
                 </h4>
             </div>
             <div class="card-body">
                 <?php if(empty($borrows)): ?>
-                    <p class="text-muted mb-0">Jelenleg nincs kölcsönzött könyved.</p>
+                    <p class="text-muted mb-0">You currently have no borrowed books.</p>
                 <?php else: ?>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Könyv címe</th>
-                                    <th>Szerző</th>
-                                    <th>Kölcsönzés dátuma</th>
-                                    <th>Határidő</th>
-                                    <th>Művelet</th>
+                                    <th>Book Title</th>
+                                    <th>Author</th>
+                                    <th>Borrow Date</th>
+                                    <th>Due Date</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -116,17 +116,17 @@ mysqli_close($conn);
                                             if($days_left < 0) {
                                                 echo '<span class="text-danger">';
                                                 echo date("Y.m.d", $return_date);
-                                                echo ' ('. abs($days_left) .' napja lejárt)';
+                                                echo ' ('. abs($days_left) .' days overdue)';
                                                 echo '</span>';
                                             } else {
                                                 echo date("Y.m.d", $return_date);
-                                                echo ' ('. $days_left .' nap van hátra)';
+                                                echo ' ('. $days_left .' days left)';
                                             }
                                             ?>
                                         </td>
                                         <td>
-                                            <a href="my_borrows.php?return=<?php echo $borrow["id"]; ?>" class="btn btn-success btn-sm" onclick="return confirm('Biztosan visszahozza a könyvet?');" data-tooltip="Könyv visszahozása">
-                                                <i class="fas fa-check me-1"></i>Visszahozás
+                                            <a href="my_borrows.php?return=<?php echo $borrow["id"]; ?>" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to return the book?');" data-tooltip="Return book">
+                                                <i class="fas fa-check me-1"></i>Return
                                             </a>
                                         </td>
                                     </tr>
@@ -134,7 +134,7 @@ mysqli_close($conn);
                             </tbody>
                         </table>
                     </div>
-                <?php endif; ?>
+                <?php endif; ?> 
             </div>
         </div>
     </div>
@@ -142,12 +142,12 @@ mysqli_close($conn);
         <div class="card">
             <div class="card-header">
                 <h4 class="mb-0">
-                    <i class="fas fa-history me-2"></i>Előzmények
+                    <i class="fas fa-history me-2"></i>History
                 </h4>
             </div>
             <div class="card-body">
                 <?php if(empty($history)): ?>
-                    <p class="text-muted mb-0">Még nem hoztál vissza könyvet.</p>
+                    <p class="text-muted mb-0">You haven't returned any books yet.</p>
                 <?php else: ?>
                     <div class="list-group">
                         <?php foreach($history as $item): ?>
@@ -164,7 +164,7 @@ mysqli_close($conn);
                                     </small>
                                 </p>
                                 <small class="text-success">
-                                    <i class="fas fa-check me-1"></i>Visszahozva
+                                    <i class="fas fa-check me-1"></i>Returned
                                 </small>
                             </div>
                         <?php endforeach; ?>

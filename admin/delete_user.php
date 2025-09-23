@@ -1,7 +1,7 @@
 <?php
 session_start();
 $current_page = 'users';
-$page_title = 'Felhasználó törlése';
+$page_title = 'Delete User';
 
 // Check if the user is logged in and is admin
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["role"] !== "admin"){
@@ -15,7 +15,7 @@ require_once "../config/db.php";
 if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
     // Prevent admin from deleting themselves
     if($_GET["id"] == $_SESSION["id"]){
-        $_SESSION["error_message"] = "Nem törölheti a saját fiókját.";
+        $_SESSION["error_message"] = "You cannot delete your own account.";
         header("location: ../admin/users.php");
         exit();
     }
@@ -32,7 +32,7 @@ if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
             $row = mysqli_fetch_array($result);
             
             if($row["active_borrows"] > 0){
-                $_SESSION["error_message"] = "A felhasználó nem törölhető, mert aktív kölcsönzése van.";
+                $_SESSION["error_message"] = "The user cannot be deleted because they have active borrowings.";
                 header("location: ../admin/users.php");
                 exit();
             }
@@ -47,11 +47,11 @@ if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
         mysqli_stmt_bind_param($stmt, "i", $param_id);
         
         if(mysqli_stmt_execute($stmt)){
-            $_SESSION["success_message"] = "A felhasználó sikeresen törölve.";
+            $_SESSION["success_message"] = "User successfully deleted.";
             header("location: ../admin/users.php");
             exit();
         } else{
-            $_SESSION["error_message"] = "Hiba történt a törlés során. Kérjük próbálja újra később.";
+            $_SESSION["error_message"] = "An error occurred during deletion. Please try again later.";
             header("location: ../admin/users.php");
             exit();
         }

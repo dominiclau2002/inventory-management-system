@@ -124,11 +124,11 @@ mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kölcsönzések - BookHive</title>
+    <title>Borrowings - BookHive</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="../../assets/css/style.css" rel="stylesheet">
@@ -146,22 +146,22 @@ mysqli_close($conn);
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="../../index.php">
-                            <i class="fas fa-home me-1"></i>Kezdőlap
+                            <i class="fas fa-home me-1"></i>Home
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../books.php">
-                            <i class="fas fa-book me-1"></i>Könyvek
+                            <i class="fas fa-book me-1"></i>Books
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="borrow.php">
-                            <i class="fas fa-clipboard-list me-1"></i>Kölcsönzések
+                            <i class="fas fa-clipboard-list me-1"></i>Borrowings
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../../admin/users.php">
-                            <i class="fas fa-users me-1"></i>Felhasználók
+                            <i class="fas fa-users me-1"></i>Users
                         </a>
                     </li>
                 </ul>
@@ -173,7 +173,7 @@ mysqli_close($conn);
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
                                 <a class="dropdown-item" href="../../auth/logout.php">
-                                    <i class="fas fa-sign-out-alt me-1"></i>Kijelentkezés
+                                    <i class="fas fa-sign-out-alt me-1"></i>Logout
                                 </a>
                             </li>
                         </ul>
@@ -189,22 +189,22 @@ mysqli_close($conn);
                 <div class="card mb-4">
                     <div class="card-header">
                         <h4 class="mb-0">
-                            <i class="fas fa-clipboard-list me-2"></i>Aktív kölcsönzések
+                            <i class="fas fa-clipboard-list me-2"></i>Active Borrowings
                         </h4>
                     </div>
                     <div class="card-body">
                         <?php if(empty($borrows)): ?>
-                            <p class="text-muted mb-0">Jelenleg nincsenek aktív kölcsönzések.</p>
+                            <p class="text-muted mb-0">No active borrowings at the moment.</p>
                         <?php else: ?>
                             <div class="table-responsive">
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Könyv</th>
-                                            <th>Kölcsönző</th>
-                                            <th>Kölcsönzés dátuma</th>
-                                            <th>Határidő</th>
-                                            <th>Művelet</th>
+                                            <th>Book</th>
+                                            <th>Borrower</th>
+                                            <th>Borrow Date</th>
+                                            <th>Due Date</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -222,17 +222,17 @@ mysqli_close($conn);
                                                     if($days_left < 0) {
                                                         echo '<span class="text-danger">';
                                                         echo date("Y.m.d", $return_date);
-                                                        echo ' ('. abs($days_left) .' napja lejárt)';
+                                                        echo ' ('. abs($days_left) .' days overdue)';
                                                         echo '</span>';
                                                     } else {
                                                         echo date("Y.m.d", $return_date);
-                                                        echo ' ('. $days_left .' nap van hátra)';
+                                                        echo ' ('. $days_left .' days left)';
                                                     }
                                                     ?>
                                                 </td>
                                                 <td>
-                                                    <a href="../borrows/borrow.php?return=<?php echo $borrow["id"]; ?>" class="btn btn-success btn-sm" data-tooltip="Könyv visszavétele">
-                                                        <i class="fas fa-check me-1"></i>Visszavétel
+                                                    <a href="../borrows/borrow.php?return=<?php echo $borrow["id"]; ?>" class="btn btn-success btn-sm" data-tooltip="Return book">
+                                                        <i class="fas fa-check me-1"></i>Return
                                                     </a>
                                                 </td>
                                             </tr>
@@ -248,26 +248,26 @@ mysqli_close($conn);
                 <div class="card">
                     <div class="card-header">
                         <h4 class="mb-0">
-                            <i class="fas fa-plus me-2"></i>Új kölcsönzés
+                            <i class="fas fa-plus me-2"></i>New Borrowing
                         </h4>
                     </div>
                     <div class="card-body">
                         <?php if(empty($available_books)): ?>
                             <div class="alert alert-info" role="alert">
-                                <i class="fas fa-info-circle me-2"></i>Jelenleg nincs kölcsönözhető könyv.
+                                <i class="fas fa-info-circle me-2"></i>No books available for borrowing at the moment.
                             </div>
                         <?php elseif(empty($users)): ?>
                             <div class="alert alert-info" role="alert">
-                                <i class="fas fa-info-circle me-2"></i>Nincsenek regisztrált felhasználók.
+                                <i class="fas fa-info-circle me-2"></i>No registered users.
                             </div>
                         <?php else: ?>
                             <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                                 <div class="mb-3">
                                     <label class="form-label">
-                                        <i class="fas fa-book me-1"></i>Könyv
+                                        <i class="fas fa-book me-1"></i>Book
                                     </label>
-                                    <select name="book_id" class="form-select" required data-tooltip="Válassza ki a kölcsönözni kívánt könyvet">
-                                        <option value="">Válasszon könyvet...</option>
+                                    <select name="book_id" class="form-select" required data-tooltip="Select the book you want to borrow">
+                                        <option value="">Select a book...</option>
                                         <?php foreach($available_books as $book): ?>
                                             <option value="<?php echo $book["id"]; ?>">
                                                 <?php echo htmlspecialchars($book["title"]); ?>
@@ -277,10 +277,10 @@ mysqli_close($conn);
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">
-                                        <i class="fas fa-user me-1"></i>Kölcsönző
+                                        <i class="fas fa-user me-1"></i>Borrower
                                     </label>
-                                    <select name="user_id" class="form-select" required data-tooltip="Válassza ki a kölcsönző felhasználót">
-                                        <option value="">Válasszon felhasználót...</option>
+                                    <select name="user_id" class="form-select" required data-tooltip="Select the borrowing user">
+                                        <option value="">Select a user...</option>
                                         <?php foreach($users as $user): ?>
                                             <option value="<?php echo $user["id"]; ?>">
                                                 <?php echo htmlspecialchars($user["name"]) . " (" . htmlspecialchars($user["username"]) . ")"; ?>
@@ -290,15 +290,15 @@ mysqli_close($conn);
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">
-                                        <i class="fas fa-calendar me-1"></i>Visszahozási határidő
+                                        <i class="fas fa-calendar me-1"></i>Return Due Date
                                     </label>
                                     <input type="date" name="return_date" class="form-control" required 
                                            min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>"
                                            value="<?php echo date('Y-m-d', strtotime('+30 days')); ?>"
-                                           data-tooltip="Adja meg a visszahozási határidőt">
+                                           data-tooltip="Enter the return due date">
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100" data-tooltip="Kölcsönzés rögzítése">
-                                    <i class="fas fa-plus me-1"></i>Kölcsönzés
+                                <button type="submit" class="btn btn-primary w-100" data-tooltip="Record borrowing">
+                                    <i class="fas fa-plus me-1"></i>Borrow
                                 </button>
                             </form>
                         <?php endif; ?>

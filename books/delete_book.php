@@ -1,7 +1,7 @@
 <?php
 session_start();
 $current_page = 'books';
-$page_title = 'Könyv törlése';
+$page_title = 'Delete Book';
 
 // Check if the user is logged in and is admin
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["role"] !== "admin"){
@@ -25,7 +25,7 @@ if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
             $row = mysqli_fetch_array($result);
             
             if($row["active_borrows"] > 0){
-                $_SESSION["error_message"] = "A könyv nem törölhető, mert aktív kölcsönzése van.";
+                $_SESSION["error_message"] = "The book cannot be deleted because it has active borrowings.";
                 header("location: ../books/books.php");
                 exit();
             }
@@ -40,11 +40,11 @@ if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
         mysqli_stmt_bind_param($stmt, "i", $param_id);
         
         if(mysqli_stmt_execute($stmt)){
-            $_SESSION["success_message"] = "A könyv sikeresen törölve.";
+            $_SESSION["success_message"] = "Book successfully deleted.";
             header("location: ../books/books.php");
             exit();
         } else{
-            $_SESSION["error_message"] = "Hiba történt a törlés során. Kérjük próbálja újra később.";
+            $_SESSION["error_message"] = "An error occurred during deletion. Please try again later.";
             header("location: ../books/books.php");
             exit();
         }

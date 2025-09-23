@@ -1,7 +1,7 @@
 <?php
 session_start();
 $current_page = 'books';
-$page_title = 'Könyv szerkesztése';
+$page_title = 'Edit Book';
 
 // Check if the user is logged in and is admin
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["role"] !== "admin"){
@@ -19,21 +19,21 @@ $title_err = $author_err = $description_err = "";
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validate title
     if(empty(trim($_POST["title"]))){
-        $title_err = "Kérem adja meg a könyv címét.";
+        $title_err = "Please enter the book title.";
     } else {
         $title = trim($_POST["title"]);
     }
     
     // Validate author
     if(empty(trim($_POST["author"]))){
-        $author_err = "Kérem adja meg a szerző nevét.";
+        $author_err = "Please enter the author's name.";
     } else {
         $author = trim($_POST["author"]);
     }
     
     // Validate description
     if(empty(trim($_POST["description"]))){
-        $description_err = "Kérem adja meg a könyv leírását.";
+        $description_err = "Please enter the book description.";
     } else {
         $description = trim($_POST["description"]);
     }
@@ -65,7 +65,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 header("location: ../books/view_book.php?id=".$_POST["id"]);
                 exit();
             } else{
-                echo "Valami hiba történt. Kérjük próbálja újra később.";
+                echo "Something went wrong. Please try again later.";
             }
             
             mysqli_stmt_close($stmt);
@@ -101,7 +101,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     exit();
                 }
             } else{
-                echo "Valami hiba történt. Kérjük próbálja újra később.";
+                echo "Something went wrong. Please try again later.";
             }
             
             mysqli_stmt_close($stmt);
@@ -120,7 +120,7 @@ require_once "../includes/header.php";
 <div class="card">
     <div class="card-header">
         <h4 class="mb-0">
-            <i class="fas fa-edit me-2"></i>Könyv szerkesztése
+            <i class="fas fa-edit me-2"></i>Edit Book
         </h4>
     </div>
     <div class="card-body">
@@ -129,14 +129,14 @@ require_once "../includes/header.php";
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label class="form-label">
-                            <i class="fas fa-book me-1"></i>Cím
+                            <i class="fas fa-book me-1"></i>Title
                         </label>
                         <input type="text" name="title" class="form-control <?php echo (!empty($title_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($title); ?>">
                         <div class="invalid-feedback"><?php echo $title_err; ?></div>
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">
-                            <i class="fas fa-user me-1"></i>Szerző
+                            <i class="fas fa-user me-1"></i>Author
                         </label>
                         <input type="text" name="author" class="form-control <?php echo (!empty($author_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($author); ?>">
                         <div class="invalid-feedback"><?php echo $author_err; ?></div>
@@ -149,7 +149,7 @@ require_once "../includes/header.php";
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">
-                            <i class="fas fa-calendar me-1"></i>Kiadás éve
+                            <i class="fas fa-calendar me-1"></i>Publication Year
                         </label>
                         <input type="number" name="year" class="form-control" value="<?php echo htmlspecialchars($year); ?>">
                     </div>
@@ -157,19 +157,19 @@ require_once "../includes/header.php";
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label class="form-label">
-                            <i class="fas fa-language me-1"></i>Nyelv
+                            <i class="fas fa-language me-1"></i>Language
                         </label>
                         <input type="text" name="language" class="form-control" value="<?php echo htmlspecialchars($language); ?>">
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">
-                            <i class="fas fa-building me-1"></i>Kiadó
+                            <i class="fas fa-building me-1"></i>Publisher
                         </label>
                         <input type="text" name="publisher" class="form-control" value="<?php echo htmlspecialchars($publisher); ?>">
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">
-                            <i class="fas fa-align-left me-1"></i>Leírás
+                            <i class="fas fa-align-left me-1"></i>Description
                         </label>
                         <textarea name="description" class="form-control <?php echo (!empty($description_err)) ? 'is-invalid' : ''; ?>" rows="4"><?php echo htmlspecialchars($description); ?></textarea>
                         <div class="invalid-feedback"><?php echo $description_err; ?></div>
@@ -178,11 +178,11 @@ require_once "../includes/header.php";
             </div>
             <input type="hidden" name="id" value="<?php echo $_GET["id"]; ?>">
             <div class="mt-3">
-                <button type="submit" class="btn btn-primary" data-tooltip="Módosítások mentése">
-                    <i class="fas fa-save me-1"></i>Mentés
+                <button type="submit" class="btn btn-primary" data-tooltip="Save changes">
+                    <i class="fas fa-save me-1"></i>Save
                 </button>
-                <a href="../books/view_book.php?id=<?php echo $_GET["id"]; ?>" class="btn btn-secondary" data-tooltip="Vissza a könyv adatlapjára">
-                    <i class="fas fa-arrow-left me-1"></i>Vissza
+                <a href="../books/view_book.php?id=<?php echo $_GET["id"]; ?>" class="btn btn-secondary" data-tooltip="Back to book details">
+                    <i class="fas fa-arrow-left me-1"></i>Back
                 </a>
             </div>
         </form>

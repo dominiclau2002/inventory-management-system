@@ -1,7 +1,7 @@
 <?php
 session_start();
 $current_page = 'register';
-$page_title = 'Regisztráció';
+$page_title = 'Register';
 
 // Check if the user is already logged in
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
@@ -17,17 +17,17 @@ $username_err = $password_err = $confirm_password_err = $name_err = "";
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validate name
     if(empty(trim($_POST["name"]))){
-        $name_err = "Kérem adja meg a nevét.";
+        $name_err = "Please enter your name.";
     } else{
         $name = trim(htmlspecialchars($_POST["name"]));
         if(strlen($name) < 2 || strlen($name) > 100) {
-            $name_err = "A név 2-100 karakter hosszú lehet.";
+            $name_err = "Name must be 2-100 characters long.";
         }
     }
 
     // Validate username
     if(empty(trim($_POST["username"]))){
-        $username_err = "Kérem adjon meg egy felhasználónevet.";
+        $username_err = "Please enter a username.";
     } else{
         $sql = "SELECT id FROM users WHERE username = ?";
         
@@ -39,12 +39,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 mysqli_stmt_store_result($stmt);
                 
                 if(mysqli_stmt_num_rows($stmt) == 1){
-                    $username_err = "Ez a felhasználónév már foglalt.";
+                    $username_err = "This username is already taken.";
                 } else{
                     $username = $param_username;
                 }
             } else{
-                echo "Hiba történt. Kérjük próbálja újra később.";
+                echo "An error occurred. Please try again later.";
             }
             mysqli_stmt_close($stmt);
         }
@@ -52,20 +52,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     // Validate password
     if(empty(trim($_POST["password"]))){
-        $password_err = "Kérem adjon meg egy jelszót.";     
+        $password_err = "Please enter a password.";     
     } elseif(strlen(trim($_POST["password"])) < 6){
-        $password_err = "A jelszónak legalább 6 karakterből kell állnia.";
+        $password_err = "Password must be at least 6 characters long.";
     } else{
         $password = trim($_POST["password"]);
     }
     
     // Validate confirm password
     if(empty(trim($_POST["confirm_password"]))){
-        $confirm_password_err = "Kérem erősítse meg a jelszót.";     
+        $confirm_password_err = "Please confirm the password.";     
     } else{
         $confirm_password = trim($_POST["confirm_password"]);
         if(empty($password_err) && ($password != $confirm_password)){
-            $confirm_password_err = "A jelszavak nem egyeznek.";
+            $confirm_password_err = "Passwords do not match.";
         }
     }
     
@@ -83,7 +83,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(mysqli_stmt_execute($stmt)){
                 header("location: ../auth/login.php");
             } else{
-                echo "Hiba történt. Kérjük próbálja újra később.";
+                echo "An error occurred. Please try again later.";
             }
             mysqli_stmt_close($stmt);
         }
@@ -99,48 +99,48 @@ require_once "../includes/header.php";
         <div class="card">
             <div class="card-header">
                 <h3 class="text-center mb-0">
-                    <i class="fas fa-user-plus me-2"></i>Regisztráció
+                    <i class="fas fa-user-plus me-2"></i>Register
                 </h3>
             </div>
             <div class="card-body">
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                     <div class="form-group mb-3">
                         <label>
-                            <i class="fas fa-user me-2"></i>Teljes név
+                            <i class="fas fa-user me-2"></i>Full Name
                         </label>
-                        <input type="text" name="name" class="form-control <?php echo (!empty($name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $name; ?>" data-tooltip="Adja meg a teljes nevét">
+                        <input type="text" name="name" class="form-control <?php echo (!empty($name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $name; ?>" data-tooltip="Enter your full name">
                         <span class="invalid-feedback"><?php echo $name_err; ?></span>
                     </div>
                     <div class="form-group mb-3">
                         <label>
-                            <i class="fas fa-user-circle me-2"></i>Felhasználónév
+                            <i class="fas fa-user-circle me-2"></i>Username
                         </label>
-                        <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>" data-tooltip="Válasszon egy egyedi felhasználónevet">
+                        <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>" data-tooltip="Choose a unique username">
                         <span class="invalid-feedback"><?php echo $username_err; ?></span>
                     </div>    
                     <div class="form-group mb-3">
                         <label>
-                            <i class="fas fa-lock me-2"></i>Jelszó
+                            <i class="fas fa-lock me-2"></i>Password
                         </label>
-                        <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>" data-tooltip="A jelszónak legalább 6 karakter hosszúnak kell lennie">
+                        <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>" data-tooltip="Password must be at least 6 characters long">
                         <span class="invalid-feedback"><?php echo $password_err; ?></span>
                     </div>
                     <div class="form-group mb-3">
                         <label>
-                            <i class="fas fa-lock me-2"></i>Jelszó megerősítése
+                            <i class="fas fa-lock me-2"></i>Confirm Password
                         </label>
-                        <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $confirm_password; ?>" data-tooltip="Írja be újra a jelszavát">
+                        <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $confirm_password; ?>" data-tooltip="Enter your password again">
                         <span class="invalid-feedback"><?php echo $confirm_password_err; ?></span>
                     </div>
                     <div class="form-group text-center">
-                        <button type="submit" class="btn btn-primary btn-block w-100" data-tooltip="Kattintson a regisztrációhoz">
-                            <i class="fas fa-user-plus me-2"></i>Regisztráció
+                        <button type="submit" class="btn btn-primary btn-block w-100" data-tooltip="Click to register">
+                            <i class="fas fa-user-plus me-2"></i>Register
                         </button>
                     </div>
                     <p class="text-center mt-3">
-                        Már van fiókja? 
-                        <a href="../auth/login.php" class="text-decoration-none" data-tooltip="Jelentkezzen be meglévő fiókjával">
-                            <i class="fas fa-sign-in-alt me-1"></i>Jelentkezzen be itt
+                        Already have an account? 
+                        <a href="../auth/login.php" class="text-decoration-none" data-tooltip="Log in with your existing account">
+                            <i class="fas fa-sign-in-alt me-1"></i>Log in here
                         </a>
                     </p>
                 </form>

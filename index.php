@@ -48,7 +48,7 @@ mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -70,30 +70,30 @@ mysqli_close($conn);
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link active" href="../index.php">
-                            <i class="fas fa-home me-1"></i>Kezdőlap
+                            <i class="fas fa-home me-1"></i>Home
                         </a>
                     </li>
                     <?php if($is_logged_in): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="books/books.php">
-                            <i class="fas fa-book me-1"></i>Könyvek
+                            <i class="fas fa-book me-1"></i>Books
                         </a>
                     </li>
                     <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="books/borrows/borrow.php">
-                            <i class="fas fa-clipboard-list me-1"></i>Kölcsönzések
+                            <i class="fas fa-clipboard-list me-1"></i>Borrowings
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/admin/users.php">
-                            <i class="fas fa-users me-1"></i>Felhasználók
+                            <i class="fas fa-users me-1"></i>Users
                         </a>
                     </li>
                     <?php else: ?>
                     <li class="nav-item">
                         <a class="nav-link" href="books/borrows/my_borrows.php">
-                            <i class="fas fa-clipboard-list me-1"></i>Kölcsönzéseim
+                            <i class="fas fa-clipboard-list me-1"></i>My Borrowings
                         </a>
                     </li>
                     <?php endif; ?>
@@ -108,7 +108,7 @@ mysqli_close($conn);
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
                                 <a class="dropdown-item" href="auth/logout.php">
-                                    <i class="fas fa-sign-out-alt me-1"></i>Kijelentkezés
+                                    <i class="fas fa-sign-out-alt me-1"></i>Logout
                                 </a>
                             </li>
                         </ul>
@@ -116,12 +116,12 @@ mysqli_close($conn);
                     <?php else: ?>
                     <li class="nav-item">
                         <a class="nav-link" href="auth/login.php">
-                            <i class="fas fa-sign-in-alt me-1"></i>Bejelentkezés
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="auth/register.php">
-                            <i class="fas fa-user-plus me-1"></i>Regisztráció
+                            <i class="fas fa-user-plus me-1"></i>Register
                         </a>
                     </li>
                     <?php endif; ?>
@@ -138,15 +138,15 @@ mysqli_close($conn);
                     <div class="card-body text-center">
                         <h1 class="display-4 mb-4">
                             <i class="fas fa-book-open text-primary me-3"></i>
-                            Üdvözöljük a BookHive-ban!
+                            Welcome to BookHive!
                         </h1>
-                        <p class="lead mb-4">Böngésszen könyveink között és kezelje kölcsönzéseit online.</p>
+                        <p class="lead mb-4">Browse our books and manage your borrowings online.</p>
                         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                            <a href="auth/login.php" class="btn btn-primary btn-lg px-4 gap-3" data-tooltip="Jelentkezzen be fiókjába">
-                                <i class="fas fa-sign-in-alt me-2"></i>Bejelentkezés
+                            <a href="auth/login.php" class="btn btn-primary btn-lg px-4 gap-3" data-tooltip="Sign in to your account">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
                             </a>
-                            <a href="auth/register.php" class="btn btn-outline-primary btn-lg px-4" data-tooltip="Hozzon létre új fiókot">
-                                <i class="fas fa-user-plus me-2"></i>Regisztráció
+                            <a href="auth/register.php" class="btn btn-outline-primary btn-lg px-4" data-tooltip="Create a new account">
+                                <i class="fas fa-user-plus me-2"></i>Register
                             </a>
                         </div>
                     </div>
@@ -160,12 +160,12 @@ mysqli_close($conn);
                 <div class="card mb-4">
                     <div class="card-header">
                         <h4 class="mb-0">
-                            <i class="fas fa-clock me-2"></i>Legújabb könyvek
+                            <i class="fas fa-clock me-2"></i>Latest Books
                         </h4>
                     </div>
                     <div class="card-body">
                         <?php if(empty($latest_books)): ?>
-                            <p class="text-muted mb-0">Jelenleg nincsenek könyvek a rendszerben.</p>
+                            <p class="text-muted mb-0">Currently no books in the system.</p>
                         <?php else: ?>
                             <div class="row">
                                 <?php foreach($latest_books as $book): ?>
@@ -177,7 +177,7 @@ mysqli_close($conn);
                                                 </h5>
                                                 <p class="card-text">
                                                     <small class="text-muted">
-                                                        <i class="fas fa-user me-1"></i>Szerző: <?php echo htmlspecialchars($book["author"]); ?>
+                                                        <i class="fas fa-user me-1"></i>Author: <?php echo htmlspecialchars($book["author"]); ?>
                                                     </small>
                                                 </p>
                                                 <p class="card-text">
@@ -185,11 +185,11 @@ mysqli_close($conn);
                                                 </p>
                                                 <?php if($is_logged_in): ?>
                                                 <a href="books/view_book.php?id=<?php echo $book["id"]; ?>" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-info-circle me-1"></i>Részletek
+                                                    <i class="fas fa-info-circle me-1"></i>Details
                                                 </a>
                                                 <?php else: ?>
                                                 <div class="alert alert-info mb-0 py-2">
-                                                    <small><i class="fas fa-info-circle me-1"></i>A részletek megtekintéséhez jelentkezzen be</small>
+                                                    <small><i class="fas fa-info-circle me-1"></i>Please log in to view details</small>
                                                 </div>
                                                 <?php endif; ?>
                                             </div>
@@ -206,12 +206,12 @@ mysqli_close($conn);
                 <div class="card">
                     <div class="card-header">
                         <h4 class="mb-0">
-                            <i class="fas fa-book-reader me-2"></i>Kölcsönzött könyveim
+                            <i class="fas fa-book-reader me-2"></i>My Borrowed Books
                         </h4>
                     </div>
                     <div class="card-body">
                         <?php if(empty($borrowed_books)): ?>
-                            <p class="text-muted mb-0">Jelenleg nincs kölcsönzött könyved.</p>
+                            <p class="text-muted mb-0">You currently have no borrowed books.</p>
                         <?php else: ?>
                             <div class="list-group">
                                 <?php foreach($borrowed_books as $book): ?>
@@ -219,7 +219,7 @@ mysqli_close($conn);
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1"><?php echo htmlspecialchars($book["title"]); ?></h5>
                                             <small class="text-muted">
-                                                Határidő: <?php echo date("Y.m.d", strtotime($book["return_date"])); ?>
+                                                Due: <?php echo date("Y.m.d", strtotime($book["return_date"])); ?>
                                             </small>
                                         </div>
                                         <p class="mb-1">
@@ -228,7 +228,7 @@ mysqli_close($conn);
                                             </small>
                                         </p>
                                         <a href="books/view_book.php?id=<?php echo $book["id"]; ?>" class="btn btn-primary btn-sm mt-2">
-                                            <i class="fas fa-info-circle me-1"></i>Részletek
+                                            <i class="fas fa-info-circle me-1"></i>Details
                                         </a>
                                     </div>
                                 <?php endforeach; ?>

@@ -63,8 +63,8 @@ if(mysqli_query($conn, $sql)){
     if(mysqli_num_rows($result) == 0){
         // Insert default admin user (password: admin123)
         $admin_password = password_hash('admin123', PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (name, username, password, role) VALUES 
-                ('Adminisztrátor', 'admin', '$admin_password', 'admin')";
+        $sql = "INSERT INTO users (name, username, password, role) VALUES
+                ('Administrator', 'admin', '$admin_password', 'admin')";
         mysqli_query($conn, $sql);
     }
 
@@ -73,16 +73,16 @@ if(mysqli_query($conn, $sql)){
     if(mysqli_num_rows($result) == 0){
         // Insert sample books
         $sql = "INSERT INTO books (title, author, isbn, publisher, year, language, description) VALUES
-                ('A Gyűrűk Ura', 'J.R.R. Tolkien', '9789634197843', 'Európa Könyvkiadó', 2021, 'magyar', 'A fantasy irodalom klasszikusa, amely egy gyűrű köré szövődő kalandos történetet mesél el. Középfölde részletes világában játszódó epikus fantasy, tele mágiával, barátságokkal és hősi tettekkel.'),
-                ('Harry Potter és a Bölcsek Köve', 'J.K. Rowling', '9789633244277', 'Animus Kiadó', 2020, 'magyar', 'A világhírű sorozat első kötete, amely bevezet minket a varázslók világába. Követjük Harry Potter első évét a Roxfort Boszorkány- és Varázslóképző Szakiskolában.'),
-                ('Az alapítvány', 'Isaac Asimov', '9789634197123', 'Gabo Kiadó', 2019, 'magyar', 'A science fiction műfaj meghatározó alkotása, amely egy galaktikus birodalom bukását és egy új civilizáció születését meséli el. Az emberiség jövőjét meghatározó tudományos fejlődés és társadalmi változások krónikája.'),
-                ('1984', 'George Orwell', '9789634197456', 'Európa Könyvkiadó', 2020, 'magyar', 'Disztópikus regény, amely egy totalitárius állam működését mutatja be. A megfigyelés, az elnyomás és az egyéni szabadság elvesztésének időtlen figyelmeztetése.'),
-                ('Kis herceg', 'Antoine de Saint-Exupéry', '9789634197789', 'Móra Könyvkiadó', 2018, 'magyar', 'Filozofikus mese gyerekeknek és felnőtteknek egyaránt. Egy kis herceg utazásain keresztül fedezzük fel az élet nagy igazságait és a barátság fontosságát.'),
-                ('A hobbit', 'J.R.R. Tolkien', '9789634197234', 'Európa Könyvkiadó', 2022, 'magyar', 'Bilbó Zsákos váratlan kalandja, amely elvezet A Gyűrűk Ura eseményeihez. Egy békés hobbit története, aki akaratán kívül egy nagy kaland részesévé válik.'),
-                ('Fahrenheit 451', 'Ray Bradbury', '9789634197567', 'Agave Könyvek', 2021, 'magyar', 'Egy olyan jövőben játszódik, ahol a könyvek tiltottak és a tűzoltók feladata azok elégetése. A tudás és a kultúra megőrzésének fontosságáról szóló klasszikus.'),
-                ('A Da Vinci-kód', 'Dan Brown', '9789634197890', 'Gabo Kiadó', 2017, 'magyar', 'Izgalmas thriller, amely művészettörténeti és vallási rejtélyek köré épül. Robert Langdon professzor egy gyilkosság nyomait követve tárul fel egy ősi titok.'),
-                ('Az éhezők viadala', 'Suzanne Collins', '9789634197345', 'Agave Könyvek', 2019, 'magyar', 'Egy disztópikus világban játszódó történet, ahol fiatalok kényszerülnek halálos játékban részt venni. Katniss Everdeen története a túlélésről és az ellenállásról.'),
-                ('A nagy Gatsby', 'F. Scott Fitzgerald', '9789634197678', 'Európa Könyvkiadó', 2020, 'magyar', 'Az amerikai álom sötét oldala, egy titokzatos milliomos történetén keresztül. A gazdagság, szerelem és illúziók klasszikus regénye az 1920-as évek Amerikájából.')";
+                ('The Lord of the Rings', 'J.R.R. Tolkien', '9789634197843', 'Europa Publishing', 2021, 'english', 'A classic of fantasy literature that tells an adventurous story revolving around a ring. An epic fantasy set in the detailed world of Middle-earth, full of magic, friendships, and heroic deeds.'),
+                ('Harry Potter and the Philosopher\'s Stone', 'J.K. Rowling', '9789633244277', 'Animus Publishing', 2020, 'english', 'The first volume of the world-famous series that introduces us to the world of wizards. We follow Harry Potter\'s first year at Hogwarts School of Witchcraft and Wizardry.'),
+                ('Foundation', 'Isaac Asimov', '9789634197123', 'Gabo Publishing', 2019, 'english', 'A defining work of the science fiction genre that tells the story of the fall of a galactic empire and the birth of a new civilization. A chronicle of scientific development and social changes that determine humanity\'s future.'),
+                ('1984', 'George Orwell', '9789634197456', 'Europa Publishing', 2020, 'english', 'A dystopian novel that presents the functioning of a totalitarian state. A timeless warning about surveillance, oppression, and the loss of individual freedom.'),
+                ('The Little Prince', 'Antoine de Saint-Exupéry', '9789634197789', 'Mora Publishing', 2018, 'english', 'A philosophical tale for both children and adults. Through a little prince\'s journeys, we discover life\'s great truths and the importance of friendship.'),
+                ('The Hobbit', 'J.R.R. Tolkien', '9789634197234', 'Europa Publishing', 2022, 'english', 'Bilbo Baggins\' unexpected adventure that leads to the events of The Lord of the Rings. The story of a peaceful hobbit who unwillingly becomes part of a great adventure.'),
+                ('Fahrenheit 451', 'Ray Bradbury', '9789634197567', 'Agave Books', 2021, 'english', 'Set in a future where books are forbidden and firefighters\' job is to burn them. A classic about the importance of preserving knowledge and culture.'),
+                ('The Da Vinci Code', 'Dan Brown', '9789634197890', 'Gabo Publishing', 2017, 'english', 'An exciting thriller built around art historical and religious mysteries. Following Professor Robert Langdon as he traces the clues of a murder, an ancient secret is revealed.'),
+                ('The Hunger Games', 'Suzanne Collins', '9789634197345', 'Agave Books', 2019, 'english', 'A story set in a dystopian world where young people are forced to participate in deadly games. Katniss Everdeen\'s story about survival and resistance.'),
+                ('The Great Gatsby', 'F. Scott Fitzgerald', '9789634197678', 'Europa Publishing', 2020, 'english', 'The dark side of the American dream, through the story of a mysterious millionaire. A classic novel about wealth, love, and illusions from 1920s America.')";
         mysqli_query($conn, $sql);
     }
 } else {

@@ -1,7 +1,7 @@
 <?php
 session_start();
 $current_page = 'books';
-$page_title = 'Könyv részletei';
+$page_title = 'Book Details';
 
 // Check if the user is logged in
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
@@ -73,16 +73,16 @@ require_once "../includes/header.php";
                     </h4>
                     <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
                     <div class="btn-group">
-                        <a href="/books/edit_book.php?id=<?php echo $book["id"]; ?>" class="btn btn-warning btn-sm" data-tooltip="Könyv szerkesztése">
-                            <i class="fas fa-edit me-1"></i>Szerkesztés
+                        <a href="/books/edit_book.php?id=<?php echo $book["id"]; ?>" class="btn btn-warning btn-sm" data-tooltip="Edit book">
+                            <i class="fas fa-edit me-1"></i>Edit
                         </a>
-                        <a href="../books/delete_book.php?id=<?php echo $book["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Biztosan törölni szeretné ezt a könyvet?');" data-tooltip="Könyv törlése">
-                            <i class="fas fa-trash me-1"></i>Törlés
+                        <a href="../books/delete_book.php?id=<?php echo $book["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this book?');" data-tooltip="Delete book">
+                            <i class="fas fa-trash me-1"></i>Delete
                         </a>
                     </div>
                     <?php elseif(isset($_SESSION["role"]) && $_SESSION["role"] == "user" && $book["status"] == "available"): ?>
-                    <a href="../books/borrows/borrow.php?book_id=<?php echo $book["id"]; ?>" class="btn btn-primary btn-sm" data-tooltip="Könyv kölcsönzése">
-                        <i class="fas fa-hand-holding me-1"></i>Kölcsönzés
+                    <a href="../books/borrows/borrow.php?book_id=<?php echo $book["id"]; ?>" class="btn btn-primary btn-sm" data-tooltip="Borrow book">
+                        <i class="fas fa-hand-holding me-1"></i>Borrow
                     </a>
                     <?php endif; ?>
                 </div>
@@ -91,36 +91,36 @@ require_once "../includes/header.php";
                 <div class="row">
                     <div class="col-md-6">
                         <p>
-                            <i class="fas fa-user me-2"></i><strong>Szerző:</strong>
+                            <i class="fas fa-user me-2"></i><strong>Author:</strong>
                             <?php echo htmlspecialchars($book["author"]); ?>
                         </p>
                         <p>
-                            <i class="fas fa-calendar me-2"></i><strong>Kiadás éve:</strong>
-                            <?php echo !empty($book["year"]) ? htmlspecialchars($book["year"]) : 'Nincs megadva'; ?>
+                            <i class="fas fa-calendar me-2"></i><strong>Publication Year:</strong>
+                            <?php echo !empty($book["year"]) ? htmlspecialchars($book["year"]) : 'Not specified'; ?>
                         </p>
                         <p>
                             <i class="fas fa-barcode me-2"></i><strong>ISBN:</strong>
-                            <?php echo !empty($book["isbn"]) ? htmlspecialchars($book["isbn"]) : 'Nincs megadva'; ?>
+                            <?php echo !empty($book["isbn"]) ? htmlspecialchars($book["isbn"]) : 'Not specified'; ?>
                         </p>
                     </div>
                     <div class="col-md-6">
                         <p>
-                            <i class="fas fa-language me-2"></i><strong>Nyelv:</strong>
-                            <?php echo !empty($book["language"]) ? htmlspecialchars($book["language"]) : 'Nincs megadva'; ?>
+                            <i class="fas fa-language me-2"></i><strong>Language:</strong>
+                            <?php echo !empty($book["language"]) ? htmlspecialchars($book["language"]) : 'Not specified'; ?>
                         </p>
                         <p>
-                            <i class="fas fa-building me-2"></i><strong>Kiadó:</strong>
-                            <?php echo !empty($book["publisher"]) ? htmlspecialchars($book["publisher"]) : 'Nincs megadva'; ?>
+                            <i class="fas fa-building me-2"></i><strong>Publisher:</strong>
+                            <?php echo !empty($book["publisher"]) ? htmlspecialchars($book["publisher"]) : 'Not specified'; ?>
                         </p>
                         <p>
-                            <i class="fas fa-clock me-2"></i><strong>Hozzáadva:</strong>
+                            <i class="fas fa-clock me-2"></i><strong>Added:</strong>
                             <?php echo date("Y.m.d", strtotime($book["created_at"])); ?>
                         </p>
                     </div>
                 </div>
                 <hr>
                 <h5 class="mb-3">
-                    <i class="fas fa-align-left me-2"></i>Leírás
+                    <i class="fas fa-align-left me-2"></i>Description
                 </h5>
                 <p class="mb-0"><?php echo nl2br(htmlspecialchars($book["description"])); ?></p>
             </div>
@@ -130,12 +130,12 @@ require_once "../includes/header.php";
         <div class="card">
             <div class="card-header">
                 <h4 class="mb-0">
-                    <i class="fas fa-history me-2"></i>Kölcsönzési előzmények
+                    <i class="fas fa-history me-2"></i>Borrowing History
                 </h4>
             </div>
             <div class="card-body">
                 <?php if(empty($borrows)): ?>
-                    <p class="text-muted mb-0">A könyvet még nem kölcsönözték ki.</p>
+                    <p class="text-muted mb-0">This book has not been borrowed yet.</p>
                 <?php else: ?>
                     <div class="list-group">
                         <?php foreach($borrows as $borrow): ?>
@@ -148,16 +148,16 @@ require_once "../includes/header.php";
                                 </div>
                                 <p class="mb-1">
                                     <small>
-                                        Határidő: <?php echo date("Y.m.d", strtotime($borrow["return_date"])); ?>
+                                        Due: <?php echo date("Y.m.d", strtotime($borrow["return_date"])); ?>
                                     </small>
                                 </p>
                                 <?php if($borrow["actual_return_date"]): ?>
                                     <small class="text-success">
-                                        <i class="fas fa-check me-1"></i>Visszahozva: <?php echo date("Y.m.d", strtotime($borrow["actual_return_date"])); ?>
+                                        <i class="fas fa-check me-1"></i>Returned: <?php echo date("Y.m.d", strtotime($borrow["actual_return_date"])); ?>
                                     </small>
                                 <?php else: ?>
                                     <small class="text-primary">
-                                        <i class="fas fa-clock me-1"></i>Jelenleg kikölcsönözve
+                                        <i class="fas fa-clock me-1"></i>Currently borrowed
                                     </small>
                                 <?php endif; ?>
                             </div>
