@@ -1,87 +1,135 @@
-# Inventory Management System
+# Product Inventory & Loaning System
 
-A simple inventory management system built with PHP and MySQL. Helps you keep track of items, users, and borrowings with an easy-to-use interface.
+A comprehensive product inventory and loaning management system built with PHP and MySQL. Designed for organizations to efficiently track products, manage user access, and handle equipment loans with an intuitive web interface.
+
+## Features
+
+### Product Management
+- Add, edit, and delete products with detailed specifications
+- Track serial numbers, categories, and ownership information
+- Monitor product status (available/borrowed)
+- Support for multiple product categories (Headsets, Keyboards, Mice, etc.)
+
+### User Management
+- Role-based access control (Admin/User)
+- Secure user registration and authentication
+- User borrowing history tracking
+
+### Loaning System
+- Simple product borrowing workflow
+- Automatic due date calculation (30-day default)
+- Return processing with status updates
+- Borrowing history and analytics
+
+### Dashboard & Analytics
+- Admin dashboard with key metrics
+- Borrowing statistics and trends
+- Overdue loan tracking
+- Export functionality for reporting
 
 ## Getting Started
 
-You'll need:
-- XAMPP
-- A modern web browser
+### Prerequisites
+- XAMPP (Apache + MySQL + PHP 7.4+)
+- Modern web browser
 
-### Quick Setup
-1. Drop the files into your XAMPP's htdocs folder
-2. Fire up Apache and MySQL in XAMPP
-3. Visit `http://localhost/index.php`
-4. The database will set itself up with some sample items on start
+### Installation
+1. Clone or download the project files
+2. Place files in your XAMPP's `htdocs` directory
+3. Start Apache and MySQL services in XAMPP Control Panel
+4. Navigate to `http://localhost/inventory-management-system/`
+5. The system will automatically create the database and tables
 
-Credentials for the admin account:
-- Username: `admin`
-- Password: `admin123`
+### Default Admin Access
+- **Username:** `admin`
+- **Password:** `admin123`
 
-## What Can You Do?
+*Note: Change the default admin password after first login*
 
-### Regular Users Can:
-- Find items using the search bar
-- See all the details about an item
-- Borrow items for 30 days
-- Keep track of when items are due
-- Check their borrowing history
+## System Architecture
 
-### Admins Can:
-- Add, edit, or remove items
-- See who's borrowed what
-- Handle borrows and returns
-- Manage user accounts
-- Check the whole inventory history
+### Frontend Technologies
+- **HTML5 & CSS3** - Modern web standards
+- **Bootstrap 5.3.0** - Responsive design framework
+- **Font Awesome 6.0.0** - Icon library
+- **JavaScript** - Interactive functionality
 
-## Technologies used in the project
+### Backend Technologies
+- **PHP 7.4+** - Server-side logic
+- **MySQL** - Database management
+- **Session Management** - User authentication
+- **Prepared Statements** - SQL injection protection
 
-### Frontend:
-- Built with HTML5 & CSS3
-- Uses Bootstrap 5.3.0 for the layout
-- Font Awesome 6.0.0 for icons
+### Database Schema
+- **`users`** - User accounts (id, name, username, password_hash, role, created_at)
+- **`products`** - Product inventory (id, product_name, category, serial_number, main_owner, prototype_version, description, status, created_at)
+- **`borrows`** - Loan records (id, product_id, user_id, borrow_date, return_date, actual_return_date, status)
 
-### Backend:
-- PHP 7.4+ doing the heavy lifting
-- MySQL keeping track of everything
-- Sessions for keeping you logged in
-- Safe from SQL injection
+## User Roles & Permissions
 
-### Database Layout:
-- `users` table: user informations (id, full name, username, hashed password, role and when was it created)
-- `books` table: item informations (id, title, author, isbn number, publisher, year, language, description, status and when was it created)
-- `borrows` table: borrow informations (borrow id, item id, user id, borrow and return date, the date when the item was actually returned and the current borrowing status)
+### Regular Users
+- Browse product catalog with search and filtering
+- View detailed product information
+- Borrow available products
+- Track personal borrowing history
+- Return borrowed items
 
-## How to Use It
+### Administrators
+- Full product management (CRUD operations)
+- User account management
+- Loan processing and oversight
+- System analytics and reporting
+- Export data to Excel format
+- Monitor overdue loans
 
-### If You're a User:
-1. Sign up through "Register"
-2. Find items to borrow
-3. Hit "Borrow" to borrow it
-4. Check "My Borrowings" to see your items
+## Product Categories
 
-### If You're an Admin:
-1. Items:
-   - Add new ones
-   - Fix details
-   - Remove old ones
-   - See who's borrowed them
+The system supports various product categories:
+- Headset (PCD/MCD)
+- Keyboard
+- Mouse & Mouse Mat
+- Speaker
+- Smart Home devices
+- Broadcaster equipment
+- Systems & Accessories
+- Controllers
 
-2. Users:
-   - Keep track of members
-   - Make someone an admin
-   - Remove accounts if needed
+## Security Features
 
-3. Borrowings:
-   - Handle checkouts
-   - Process returns
-   - Check who's late
+- **Password Hashing** - Secure password storage using PHP's password_hash()
+- **SQL Injection Prevention** - All database queries use prepared statements
+- **XSS Protection** - User input sanitization with htmlspecialchars()
+- **Session Security** - Secure session management
+- **Role-based Access Control** - Restricted admin functionality
 
-## Additional Information
-- Keep XAMPP updated
-- What does the system handle:
-  - Checking if items are available
-  - Setting due dates
-  - Making sure you're logged in
-  - Keeping track of who can do what
+## Development
 
+### File Structure
+```
+inventory-management-system/
+├── admin/              # Admin-only functionality
+├── auth/              # Authentication (login/register/logout)
+├── products/          # Product management
+│   └── borrows/       # Borrowing system
+├── includes/          # Shared components (header/footer)
+├── assets/           # CSS, images, and static files
+├── config/           # Database and application configuration
+└── index.php         # Landing page
+```
+
+### Customization
+- Modify CSS variables in `assets/css/style.css` for theming
+- Update product categories in relevant PHP files
+- Adjust borrowing period in borrowing logic
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is open source. Feel free to use and modify for your organization's needs.
