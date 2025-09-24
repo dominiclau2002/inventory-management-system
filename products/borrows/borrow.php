@@ -11,8 +11,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     exit;
 }
 
-// For non-admin users, only allow direct product borrowing
-if($_SESSION["role"] !== "admin" && !isset($_GET["product_id"])) {
+// For non-admin users, only allow direct product borrowing or form submissions
+if($_SESSION["role"] !== "admin" && !isset($_GET["product_id"]) && $_SERVER["REQUEST_METHOD"] !== "POST") {
     header("location: " . url("index.php"));
     exit;
 }
@@ -44,8 +44,16 @@ if(isset($_GET["return"]) && !empty($_GET["return"])){
 // Process new borrow
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     $product_id = $_POST["product_id"];
-    $user_id = $_POST["user_id"];
     $return_date = $_POST["return_date"];
+
+    // For regular users, use their own user_id; for admins, use selected user_id
+    if($_SESSION["role"] == "admin") {
+        $user_id = $_POST["user_id"];
+        $redirect_url = url("products/borrows/borrow.php");
+    } else {
+        $user_id = $_SESSION["id"];
+        $redirect_url = url("products/view_product.php?id=" . $product_id);
+    }
 
     $sql = "INSERT INTO borrows (product_id, user_id, borrow_date, return_date) VALUES (?, ?, NOW(), ?)";
 
@@ -53,7 +61,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         mysqli_stmt_bind_param($stmt, "iis", $product_id, $user_id, $return_date);
 
         if(mysqli_stmt_execute($stmt)){
-            header("location: " . url("products/borrows/borrow.php"));
+            // Update product status to borrowed
+            $sql = "UPDATE products SET status = 'borrowed' WHERE id = ?";
+            if($stmt = mysqli_prepare($conn, $sql)) {
+                mysqli_stmt_bind_param($stmt, "i", $product_id);
+                mysqli_stmt_execute($stmt);
+            }
+            header("location: " . $redirect_url);
             exit();
         }
         mysqli_stmt_close($stmt);
@@ -163,77 +177,80 @@ require_once "../../includes/header.php";
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="mb-0">
-                            <i class="fas fa-plus me-2"></i>New Product Loan
-                        </h4>
-                    </div>
-                    <div class="card-body">
-                        <?php if(empty($available_products)): ?>
-                            <div class="alert alert-info" role="alert">
-                                <i class="fas fa-info-circle me-2"></i>No products available for loan at the moment.
-                            </div>
-                        <?php elseif(empty($users)): ?>
-                            <div class="alert alert-info" role="alert">
-                                <i class="fas fa-info-circle me-2"></i>No registered users.
-                            </div>
-                        <?php else: ?>
-                            <form method="POST" action="<?php echo url('products/borrows/borrow.php'); ?>">
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        <i class="fas fa-box me-1"></i>Product
-                                    </label>
-                                    <select name="product_id" class="form-select" required data-tooltip="Select the product you want to borrow">
-                                        <option value="">Select a product...</option>
-                                        <?php foreach($available_products as $product): ?>
-                                            <option value="<?php echo $product["id"]; ?>">
-                                                <?php
-                                                echo htmlspecialchars($product["product_name"]);
+                <?php if($_SESSION["role"] == "admin"): ?>
+                    <!-- Admin Form -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fas fa-plus me-2"></i>New Product Loan
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <?php if(empty($available_products)): ?>
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fas fa-info-circle me-2"></i>No products available for loan at the moment.
+                                </div>
+                            <?php elseif(empty($users)): ?>
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fas fa-info-circle me-2"></i>No registered users.
+                                </div>
+                            <?php else: ?>
+                                <form method="POST" action="<?php echo url('products/borrows/borrow.php'); ?>">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-box me-1"></i>Product
+                                        </label>
+                                        <select name="product_id" class="form-select" required data-tooltip="Select the product you want to borrow">
+                                            <option value="">Select a product...</option>
+                                            <?php foreach($available_products as $product): ?>
+                                                <option value="<?php echo $product["id"]; ?>">
+                                                    <?php
+                                                    echo htmlspecialchars($product["product_name"]);
 
-                                                // Display serial number if available
-                                                if (!empty($product["serial_number"])) {
-                                                    echo " - SN: " . htmlspecialchars($product["serial_number"]);
-                                                } elseif (!empty($product["alt_serial_number"])) {
-                                                    echo " - Alt SN: " . htmlspecialchars($product["alt_serial_number"]);
-                                                }
+                                                    // Display serial number if available
+                                                    if (!empty($product["serial_number"])) {
+                                                        echo " - SN: " . htmlspecialchars($product["serial_number"]);
+                                                    } elseif (!empty($product["alt_serial_number"])) {
+                                                        echo " - Alt SN: " . htmlspecialchars($product["alt_serial_number"]);
+                                                    }
 
-                                                // Add category for additional context
-                                                echo " (" . htmlspecialchars($product["category"]) . ")";
-                                                ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        <i class="fas fa-user me-1"></i>Loanee
-                                    </label>
-                                    <select name="user_id" class="form-select" required data-tooltip="Select the borrowing user">
-                                        <option value="">Select a user...</option>
-                                        <?php foreach($users as $user): ?>
-                                            <option value="<?php echo $user["id"]; ?>">
-                                                <?php echo htmlspecialchars($user["name"]) . " (" . htmlspecialchars($user["username"]) . ")"; ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        <i class="fas fa-calendar me-1"></i>Return Due Date
-                                    </label>
-                                    <input type="date" name="return_date" class="form-control" required 
-                                           min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>"
-                                           value="<?php echo date('Y-m-d', strtotime('+30 days')); ?>"
-                                           data-tooltip="Enter the return due date">
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100" data-tooltip="Record borrowing">
-                                    <i class="fas fa-plus me-1"></i>Borrow
-                                </button>
-                            </form>
-                        <?php endif; ?>
+                                                    // Add category for additional context
+                                                    echo " (" . htmlspecialchars($product["category"]) . ")";
+                                                    ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-user me-1"></i>Loanee
+                                        </label>
+                                        <select name="user_id" class="form-select" required data-tooltip="Select the borrowing user">
+                                            <option value="">Select a user...</option>
+                                            <?php foreach($users as $user): ?>
+                                                <option value="<?php echo $user["id"]; ?>">
+                                                    <?php echo htmlspecialchars($user["name"]) . " (" . htmlspecialchars($user["username"]) . ")"; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-calendar me-1"></i>Return Due Date
+                                        </label>
+                                        <input type="date" name="return_date" class="form-control" required
+                                               min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>"
+                                               value="<?php echo date('Y-m-d', strtotime('+30 days')); ?>"
+                                               data-tooltip="Enter the return due date">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100" data-tooltip="Record borrowing">
+                                        <i class="fas fa-plus me-1"></i>Borrow
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
 

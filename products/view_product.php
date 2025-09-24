@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once "../config/config.php";
+
 $current_page = 'products';
 $page_title = 'Product Details';
 
@@ -86,9 +88,9 @@ require_once "../includes/header.php";
                             </a>
                         </div>
                     <?php elseif (isset($_SESSION["role"]) && $_SESSION["role"] == "user" && $product["status"] == "available"): ?>
-                        <a href="../products/borrows/borrow.php?product_id=<?php echo $product["id"]; ?>" class="btn btn-info btn-sm" data-tooltip="Borrow product">
+                        <button onclick="toggleBorrowForm()" class="btn btn-info btn-sm" data-tooltip="Borrow product">
                             <i class="fas fa-hand-holding me-1"></i>Borrow
-                        </a>
+                        </button>
                     <?php endif; ?>
                 </div>
             </div>
@@ -130,10 +132,13 @@ require_once "../includes/header.php";
                     </div>
                 </div>
                 <hr>
+
+                <?php if (!empty($product["description"])): ?>
                 <h5 class="mb-3">
                     <i class="fas fa-align-left me-2"></i>Description
                 </h5>
                 <p class="mb-0"><?php echo nl2br(htmlspecialchars($product["description"])); ?></p>
+                <?php endif; ?>
 
                 <?php if (!empty($product["remarks"])): ?>
                     <hr>
@@ -187,5 +192,72 @@ require_once "../includes/header.php";
         </div>
     </div>
 </div>
+
+<!-- Borrowing Form (hidden by default) -->
+<?php if (isset($_SESSION["role"]) && $_SESSION["role"] == "user" && $product["status"] == "available"): ?>
+<div id="borrowForm" class="row mt-3" style="display: none;">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar me-2"></i>Set Return Date for: <?php echo htmlspecialchars($product["product_name"]); ?>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="<?php echo url('products/borrows/borrow.php'); ?>">
+                    <input type="hidden" name="product_id" value="<?php echo $product["id"]; ?>">
+                    <input type="hidden" name="user_id" value="<?php echo $_SESSION["id"]; ?>">
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-calendar me-1"></i>Return Due Date
+                        </label>
+                        <input type="date" name="return_date" class="form-control" required
+                               min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>"
+                               value="<?php echo date('Y-m-d', strtotime('+30 days')); ?>"
+                               data-tooltip="Select your preferred return date">
+                        <small class="form-text text-muted">You can select any date from tomorrow onwards</small>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" onclick="toggleBorrowForm()" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-1"></i>Confirm Borrowing
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<script>
+function toggleBorrowForm() {
+    const form = document.getElementById('borrowForm');
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+        form.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        form.style.display = 'none';
+    }
+}
+</script>
+
+<style>
+    /* Make date input calendar icon visible on dark background */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+        filter: invert(1) sepia(1) hue-rotate(100deg) saturate(2);
+    }
+</style>
 
 <?php require_once "../includes/footer.php"; ?>
