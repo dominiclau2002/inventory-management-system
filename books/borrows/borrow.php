@@ -18,18 +18,15 @@ if($_SESSION["role"] !== "admin" && !isset($_GET["product_id"])) {
 }
 
 require_once "../../config/db.php";
-require_once "../../includes/borrowing_table.php";
-require_once "../../includes/header.php";
-
 
 // Process return product
 if(isset($_GET["return"]) && !empty($_GET["return"])){
     $sql = "UPDATE borrows SET actual_return_date = NOW() WHERE id = ?";
-    
+
     if($stmt = mysqli_prepare($conn, $sql)){
         mysqli_stmt_bind_param($stmt, "i", $param_id);
         $param_id = $_GET["return"];
-        
+
         if(mysqli_stmt_execute($stmt)){
             header("location: " . url("books/borrows/borrow.php"));
             exit();
@@ -43,12 +40,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $product_id = $_POST["product_id"];
     $user_id = $_POST["user_id"];
     $return_date = $_POST["return_date"];
-    
+
     $sql = "INSERT INTO borrows (product_id, user_id, borrow_date, return_date) VALUES (?, ?, NOW(), ?)";
-    
+
     if($stmt = mysqli_prepare($conn, $sql)){
         mysqli_stmt_bind_param($stmt, "iis", $product_id, $user_id, $return_date);
-        
+
         if(mysqli_stmt_execute($stmt)){
             header("location: " . url("books/borrows/borrow.php"));
             exit();
@@ -131,6 +128,7 @@ mysqli_close($conn);
 
 // Set flag for header path resolution
 $is_root_level = false;
+require_once "../../includes/borrowing_table.php";
 require_once "../../includes/header.php";
 ?>
         <div class="row">

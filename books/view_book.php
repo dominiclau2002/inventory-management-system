@@ -68,9 +68,14 @@ require_once "../includes/header.php";
         <div class="card mb-4">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">
-                        <i class="fas fa-box me-2"></i><?php echo htmlspecialchars($product["product_name"]); ?>
-                    </h4>
+                    <div class="d-flex align-items-center">
+                        <a href="../books/books.php" class="btn btn-success btn-sm me-3" data-tooltip="Back to products">
+                            <i class="fas fa-arrow-left me-1"></i>Back
+                        </a>
+                        <h4 class="mb-0">
+                            <i class="fas fa-box me-2"></i><?php echo htmlspecialchars($product["product_name"]); ?>
+                        </h4>
+                    </div>
                     <?php if (isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
                         <div class="btn-group">
                             <a href="../books/edit_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-warning btn-sm" data-tooltip="Edit product">

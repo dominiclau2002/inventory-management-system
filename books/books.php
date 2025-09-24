@@ -159,32 +159,27 @@ mysqli_close($conn);
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card">
+        <div class="card" style="position: relative; z-index: 1050;">
             <div class="card-header">
                 <h4 class="mb-0">
                     <i class="fas fa-info-circle me-2"></i>Information
                 </h4>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="overflow: visible;">
                 <p class="mb-3">
                     <i class="fas fa-box text-primary me-2"></i>Total products: <?php echo count($products); ?>
                 </p>
                 <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
-                <div class="dropdown">
-                    <button class="btn btn-success btn-sm dropdown-toggle w-100" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-download me-1"></i>Export Products
-                    </button>
-                    <ul class="dropdown-menu w-100" aria-labelledby="exportDropdown">
-                        <li><a class="dropdown-item" href="<?php echo url('admin/export_products.php?type=all'); ?>">
-                            <i class="fas fa-file-excel me-2"></i>All Products
-                        </a></li>
-                        <li><a class="dropdown-item" href="<?php echo url('admin/export_products.php?type=available'); ?>">
-                            <i class="fas fa-warehouse me-2"></i>Available Only
-                        </a></li>
-                        <li><a class="dropdown-item" href="<?php echo url('admin/export_products.php?type=on_loan'); ?>">
-                            <i class="fas fa-handshake me-2"></i>On Loan Only
-                        </a></li>
-                    </ul>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-download text-success me-1"></i>Export Products
+                    </label>
+                    <select class="form-select" onchange="if(this.value) window.location.href=this.value" data-tooltip="Export products to Excel" style="border-color: #198754; color: #198754; border: 2px solid #198754;">
+                        <option value="">Select export type...</option>
+                        <option value="<?php echo url('admin/export_products.php?type=all'); ?>">All Products</option>
+                        <option value="<?php echo url('admin/export_products.php?type=available'); ?>">Available Only</option>
+                        <option value="<?php echo url('admin/export_products.php?type=on_loan'); ?>">On Loan Only</option>
+                    </select>
                 </div>
                 <?php endif; ?>
             </div>

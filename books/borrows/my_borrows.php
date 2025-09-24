@@ -13,15 +13,14 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 require_once "../../config/db.php";
 require_once "../../includes/borrowing_table.php";
-require_once "../../includes/header.php";
 
 // Process return product request
 if(isset($_GET["return"]) && !empty($_GET["return"])){
     $sql = "UPDATE borrows SET actual_return_date = NOW() WHERE id = ? AND user_id = ?";
-    
+
     if($stmt = mysqli_prepare($conn, $sql)){
         mysqli_stmt_bind_param($stmt, "ii", $_GET["return"], $_SESSION["id"]);
-        
+
         if(mysqli_stmt_execute($stmt)){
             // Update product status
             $sql = "UPDATE products SET status = 'available' WHERE id = (SELECT product_id FROM borrows WHERE id = ?)";
@@ -35,6 +34,8 @@ if(isset($_GET["return"]) && !empty($_GET["return"])){
         mysqli_stmt_close($stmt);
     }
 }
+
+require_once "../../includes/header.php";
 
 // Get user's active borrows
 $borrows = array();

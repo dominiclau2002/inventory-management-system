@@ -13,12 +13,70 @@ $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="<?php echo asset('css/style.css'); ?>" rel="stylesheet">
+    <style>
+        /* Global black background override */
+        body {
+            background: #000000 !important;
+            color: #ffffff;
+        }
+
+        /* Ensure cards and content remain readable with dark theme */
+        .card {
+            background-color: #1a1a1a !important;
+            color: #ffffff;
+            border: 1px solid #333;
+        }
+
+        .card-header {
+            background-color: #2a2a2a !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid #333;
+        }
+
+        .table {
+            color: #ffffff;
+        }
+
+        .table tbody tr {
+            background-color: #1a1a1a !important;
+        }
+
+        .table thead th {
+            background-color: #2a2a2a !important;
+            color: #ffffff !important;
+        }
+
+        .list-group-item {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border-color: #333 !important;
+        }
+
+        .form-control, .form-select {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border-color: #333 !important;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border-color: #4CAF50 !important;
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25) !important;
+        }
+
+        /* Fix text-muted to be white instead of grey on dark background */
+        .text-muted {
+            color: #ffffff !important;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="<?php echo url('index.php'); ?>">
-                <i class="fas fa-book-reader me-2"></i><?php echo APP_SHORT_NAME; ?>
+                <img src="<?php echo asset('images/logo.png'); ?>" alt="Logo" style="width: 30px; height: 30px; object-fit: contain;" class="me-2"><?php echo APP_SHORT_NAME; ?>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -48,7 +106,7 @@ $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'users' ? 'active' : ''; ?>" href="<?php echo url('admin/dashboard.php'); ?>">
+                        <a class="nav-link <?php echo $current_page === 'dashboard' ? 'active' : ''; ?>" href="<?php echo url('admin/dashboard.php'); ?>">
                             <i class="fas fa-line-chart me-1"></i>Dashboard
                         </a>
                     </li>

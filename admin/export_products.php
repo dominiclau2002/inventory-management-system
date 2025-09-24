@@ -73,15 +73,19 @@ if (!$result) {
     die("Query failed: " . mysqli_error($conn));
 }
 
-// Set headers for CSV download
-header('Content-Type: text/csv; charset=utf-8');
-header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+// Set headers for Excel download
+header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+header('Content-Disposition: attachment; filename="' . $filename . '.xls"');
 
-// Create output stream
-$output = fopen('php://output', 'w');
-
-// Add BOM for proper Excel UTF-8 handling
-fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+// Start HTML table format that Excel accepts
+echo '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' . "\n";
+echo '<head>' . "\n";
+echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "\n";
+echo '<meta name="ProgId" content="Excel.Sheet" />' . "\n";
+echo '<meta name="Generator" content="Microsoft Excel" />' . "\n";
+echo '</head>' . "\n";
+echo '<body>' . "\n";
+echo '<table border="1">' . "\n";
 
 // Define CSV headers based on export type
 if ($export_type == 'available') {
@@ -118,11 +122,17 @@ if ($export_type == 'available') {
     ];
 }
 
-// Write headers
-fputcsv($output, $headers);
+// Write headers row
+echo '<tr>' . "\n";
+foreach($headers as $header) {
+    echo '<th style="background-color: #f0f0f0; font-weight: bold;">' . htmlspecialchars($header) . '</th>' . "\n";
+}
+echo '</tr>' . "\n";
 
 // Write data rows
 while($row = mysqli_fetch_assoc($result)) {
+    echo '<tr>' . "\n";
+
     if ($export_type == 'available') {
         $data = [
             $row['id'],
@@ -156,11 +166,18 @@ while($row = mysqli_fetch_assoc($result)) {
             $row['created_at']
         ];
     }
-    fputcsv($output, $data);
+
+    foreach($data as $cell) {
+        echo '<td>' . htmlspecialchars($cell) . '</td>' . "\n";
+    }
+
+    echo '</tr>' . "\n";
 }
 
-// Close output stream
-fclose($output);
+// Close HTML table
+echo '</table>' . "\n";
+echo '</body>' . "\n";
+echo '</html>' . "\n";
 
 // Close database connection
 mysqli_close($conn);

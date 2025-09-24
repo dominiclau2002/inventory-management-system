@@ -117,24 +117,17 @@ require_once "../includes/header.php";
         <div class="d-flex justify-content-between align-items-center">
             <h2><i class="fas fa-chart-line me-2"></i>Inventory Dashboard</h2>
             <div class="d-flex align-items-center gap-3">
-                <div class="dropdown">
-                    <button class="btn btn-success dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="form-group">
+                    <label class="form-label">
                         <i class="fas fa-download me-1"></i>Export Data
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                        <li><a class="dropdown-item" href="<?php echo url('admin/export_products.php?type=all'); ?>">
-                            <i class="fas fa-file-excel me-2"></i>All Products
-                        </a></li>
-                        <li><a class="dropdown-item" href="<?php echo url('admin/export_products.php?type=available'); ?>">
-                            <i class="fas fa-warehouse me-2"></i>Available Products
-                        </a></li>
-                        <li><a class="dropdown-item" href="<?php echo url('admin/export_products.php?type=on_loan'); ?>">
-                            <i class="fas fa-handshake me-2"></i>Products on Loan
-                        </a></li>
-                        <li><a class="dropdown-item" href="<?php echo url('admin/export_products.php?type=overdue'); ?>">
-                            <i class="fas fa-exclamation-triangle me-2"></i>Overdue Products
-                        </a></li>
-                    </ul>
+                    </label>
+                    <select class="form-select" onchange="if(this.value) window.location.href=this.value" data-tooltip="Export dashboard data to Excel" style="border: 2px solid #198754; color: #198754;">
+                        <option value="">Select export type...</option>
+                        <option value="<?php echo url('admin/export_products.php?type=all'); ?>">All Products</option>
+                        <option value="<?php echo url('admin/export_products.php?type=available'); ?>">Available Products</option>
+                        <option value="<?php echo url('admin/export_products.php?type=on_loan'); ?>">Products on Loan</option>
+                        <option value="<?php echo url('admin/export_products.php?type=overdue'); ?>">Overdue Products</option>
+                    </select>
                 </div>
                 <div class="text-muted">
                     <i class="fas fa-clock me-1"></i>Last updated: <?php echo date('Y-m-d H:i:s'); ?>
@@ -426,13 +419,6 @@ require_once "../includes/header.php";
     background-color: #dee2e6;
 }
 
-.dropdown-item{
-    z-index: 1000;
-}
-
-.dropdown-menu {
-    z-index: 1000;
-}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
