@@ -90,13 +90,13 @@ $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
                     </li>
                     <?php if($is_logged_in): ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'books' ? 'active' : ''; ?>" href="<?php echo url('books/books.php'); ?>">
-                            <i class="fas fa-book me-1"></i>Products
+                        <a class="nav-link <?php echo $current_page === 'products' ? 'active' : ''; ?>" href="<?php echo url('products/products.php'); ?>">
+                            <i class="fas fa-warehouse me-1"></i>All Products
                         </a>
                     </li>
                     <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'borrows' ? 'active' : ''; ?>" href="<?php echo url('books/borrows/borrow.php'); ?>">
+                        <a class="nav-link <?php echo $current_page === 'borrows' ? 'active' : ''; ?>" href="<?php echo url('products/borrows/borrow.php'); ?>">
                             <i class="fas fa-clipboard-list me-1"></i>Loans
                         </a>
                     </li>
@@ -112,7 +112,7 @@ $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
                     </li>
                     <?php else: ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === 'my_borrows' ? 'active' : ''; ?>" href="<?php echo url('books/borrows/my_borrows.php'); ?>">
+                        <a class="nav-link <?php echo $current_page === 'my_borrows' ? 'active' : ''; ?>" href="<?php echo url('products/borrows/my_borrows.php'); ?>">
                             <i class="fas fa-clipboard-list me-1"></i>My Loans
                         </a>
                     </li>

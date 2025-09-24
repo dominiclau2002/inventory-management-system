@@ -21,7 +21,7 @@ require_once "includes/header.php";
 
     /* Make navbar more transparent for landing page */
     .navbar {
-        background-color: rgba(40, 54, 24, 0.9) !important;
+        background-color: #2c2c2c !important;
         backdrop-filter: blur(10px);
         position: relative;
         z-index: 1050;
@@ -309,8 +309,8 @@ require_once "includes/header.php";
     <h1 class="main-title">CA Product Sample<br>Inventory Management</h1>
 
     <!-- Main Enter button -->
-    <a href="<?php echo $is_logged_in ? 'books/books.php' : 'auth/login.php'; ?>" class="enter-btn mb-4">
-        <i class="fas fa-box-open"></i>
+    <a href="<?php echo $is_logged_in ? 'products/products.php' : 'auth/login.php'; ?>" class="enter-btn mb-4">
+        <i class="fas fa-warehouse"></i>
         <?php echo $is_logged_in ? 'View All Products' : 'Get Started'; ?>
     </a>
 
@@ -327,7 +327,7 @@ require_once "includes/header.php";
                         </a>
                     </div>
                     <div class="col-md-6 col-lg-3">
-                        <a href="books/borrows/borrow.php" class="secondary-btn">
+                        <a href="products/borrows/borrow.php" class="secondary-btn">
                             <i class="fas fa-handshake"></i>
                             Manage Loans
                         </a>
@@ -339,7 +339,7 @@ require_once "includes/header.php";
                         </a>
                     </div>
                     <div class="col-md-6 col-lg-3">
-                        <a href="books/add_book.php" class="secondary-btn">
+                        <a href="products/add_product.php" class="secondary-btn">
                             <i class="fas fa-plus"></i>
                             Add Product
                         </a>
@@ -349,7 +349,7 @@ require_once "includes/header.php";
                 <!-- Regular user buttons -->
                 <div class="row g-3 justify-content-center">
                     <div class="col-md-6 col-lg-4">
-                        <a href="books/borrows/my_borrows.php" class="secondary-btn">
+                        <a href="products/borrows/my_borrows.php" class="secondary-btn">
                             <i class="fas fa-clipboard-list"></i>
                             My Loans
                         </a>

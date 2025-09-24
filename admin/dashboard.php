@@ -310,7 +310,7 @@ require_once "../includes/header.php";
                     </div>
                     <?php if(count($recent_loans) > 5): ?>
                         <div class="text-center">
-                            <a href="<?php echo url('books/borrows/borrow.php'); ?>" class="btn btn-sm btn-outline-primary">
+                            <a href="<?php echo url('products/borrows/borrow.php'); ?>" class="btn btn-sm btn-outline-primary">
                                 View All Loans
                             </a>
                         </div>
@@ -351,7 +351,7 @@ require_once "../includes/header.php";
                                         <span class="badge bg-danger"><?php echo $overdue['days_overdue']; ?> days</span>
                                     </td>
                                     <td>
-                                        <a href="<?php echo url('books/borrows/borrow.php'); ?>" class="btn btn-sm btn-outline-primary">
+                                        <a href="<?php echo url('products/borrows/borrow.php'); ?>" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
                                     </td>

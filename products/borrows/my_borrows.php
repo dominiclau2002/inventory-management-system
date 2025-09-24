@@ -86,9 +86,14 @@ mysqli_close($conn);
     <div class="col-md-8">
         <div class="card mb-4">
             <div class="card-header">
-                <h4 class="mb-0">
-                    <i class="fas fa-box me-2"></i>My Current Borrowings
-                </h4>
+                <div class="d-flex align-items-center">
+                    <a href="../../products/products.php" class="btn btn-success btn-sm me-3" data-tooltip="Back to products">
+                        <i class="fas fa-arrow-left me-1"></i>Back
+                    </a>
+                    <h4 class="mb-0">
+                        <i class="fas fa-box me-2"></i>My Current Borrowings
+                    </h4>
+                </div>
             </div>
             <div class="card-body">
                 <?php

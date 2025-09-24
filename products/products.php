@@ -1,6 +1,6 @@
 <?php
 session_start();
-$current_page = 'books';
+$current_page = 'products';
 $page_title = 'Products';
 
 // Check if the user is logged in
@@ -22,38 +22,38 @@ if($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET["search_product_name"]) |
     // Sanitize inputs
     $search_product_name = isset($_GET["search_product_name"]) ? trim(htmlspecialchars($_GET["search_product_name"])) : "";
     $search_category = isset($_GET["search_category"]) ? trim(htmlspecialchars($_GET["search_category"])) : "";
-    
+
     // Prepare the base query
     $sql = "SELECT * FROM products WHERE 1=1";
     $params = array();
     $types = "";
-    
+
     // Add product name search condition if provided
     if(!empty($search_product_name)){
         $sql .= " AND product_name LIKE ?";
         $params[] = "%" . $search_product_name . "%";
         $types .= "s";
     }
-    
+
     // Add category search condition if provided
     if(!empty($search_category) && $search_category != "All Categories"){
         $sql .= " AND category = ?";
         $params[] = $search_category;
         $types .= "s";
     }
-    
+
     // Add sorting based on availability preference
     if($sort_by_availability == "available_first"){
         $sql .= " ORDER BY CASE WHEN status = 'available' THEN 0 ELSE 1 END, product_name ASC";
     } else {
         $sql .= " ORDER BY CASE WHEN status = 'borrowed' THEN 0 ELSE 1 END, product_name ASC";
     }
-    
+
     if($stmt = mysqli_prepare($conn, $sql)){
         if(!empty($params)){
             mysqli_stmt_bind_param($stmt, $types, ...$params);
         }
-        
+
         if(mysqli_stmt_execute($stmt)){
             $result = mysqli_stmt_get_result($stmt);
 
@@ -104,7 +104,7 @@ mysqli_close($conn);
                     <i class="fas fa-search me-2"></i>Search Products
                 </h4>
                 <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
-                <a href="../books/add_book.php" class="btn btn-primary btn-sm" data-tooltip="Add new product">
+                <a href="../products/add_product.php" class="btn btn-primary btn-sm" data-tooltip="Add new product">
                     <i class="fas fa-plus me-1"></i>New Product
                 </a>
                 <?php endif; ?>
@@ -269,15 +269,15 @@ mysqli_close($conn);
 
 
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <a href="../books/view_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-primary btn-sm" data-tooltip="Product details">
+                                    <a href="../products/view_product.php?id=<?php echo $product["id"]; ?>" class="btn btn-primary btn-sm" data-tooltip="Product details">
                                         <i class="fas fa-info-circle me-1"></i>Details
                                     </a>
                                     <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
                                     <div class="btn-group">
-                                        <a href="../books/edit_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-warning btn-sm me-2" data-tooltip="Edit product">
+                                        <a href="../products/edit_product.php?id=<?php echo $product["id"]; ?>" class="btn btn-warning btn-sm me-2" data-tooltip="Edit product">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="../books/delete_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');" data-tooltip="Delete product">
+                                        <a href="../products/delete_product.php?id=<?php echo $product["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');" data-tooltip="Delete product">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -292,4 +292,4 @@ mysqli_close($conn);
     <?php endforeach; ?>
 <?php endif; ?>
 
-<?php require_once "../includes/footer.php"; ?> 
+<?php require_once "../includes/footer.php"; ?>

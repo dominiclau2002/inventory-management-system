@@ -1,6 +1,6 @@
 <?php
 session_start();
-$current_page = 'books';
+$current_page = 'products';
 $page_title = 'Edit Product';
 
 // Check if the user is logged in and is admin
@@ -56,7 +56,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $serial_number = !empty($_POST["serial_number"]) ? trim($_POST["serial_number"]) : null;
     $alt_serial_number = !empty($_POST["alt_serial_number"]) ? trim($_POST["alt_serial_number"]) : null;
     $remarks = !empty($_POST["remarks"]) ? trim($_POST["remarks"]) : null;
-    
+
     // Check input errors before updating in database
     if(empty($product_name_err) && empty($category_err) && empty($main_owner_err) && empty($prototype_version_err) && empty($description_err)){
         // Prepare an update statement
@@ -64,7 +64,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
         if($stmt = mysqli_prepare($conn, $sql)){
             mysqli_stmt_bind_param($stmt, "ssssssssi", $param_product_name, $param_category, $param_serial_number, $param_alt_serial_number, $param_main_owner, $param_prototype_version, $param_description, $param_remarks, $param_id);
-            
+
             $param_product_name = $product_name;
             $param_category = $category;
             $param_serial_number = $serial_number;
@@ -74,14 +74,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $param_description = $description;
             $param_remarks = $remarks;
             $param_id = $_POST["id"];
-            
+
             if(mysqli_stmt_execute($stmt)){
-                header("location: ../books/view_book.php?id=".$_POST["id"]);
+                header("location: ../products/view_product.php?id=".$_POST["id"]);
                 exit();
             } else{
                 echo "Something went wrong. Please try again later.";
             }
-            
+
             mysqli_stmt_close($stmt);
         }
     }
@@ -90,19 +90,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
         // Get URL parameter
         $id = trim($_GET["id"]);
-        
+
         // Prepare a select statement
         $sql = "SELECT * FROM products WHERE id = ?";
         if($stmt = mysqli_prepare($conn, $sql)){
             mysqli_stmt_bind_param($stmt, "i", $param_id);
             $param_id = $id;
-            
+
             if(mysqli_stmt_execute($stmt)){
                 $result = mysqli_stmt_get_result($stmt);
-                
+
                 if(mysqli_num_rows($result) == 1){
                     $row = mysqli_fetch_array($result);
-                    
+
                     $product_name = $row["product_name"];
                     $category = $row["category"];
                     $serial_number = $row["serial_number"];
@@ -112,17 +112,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     $description = $row["description"];
                     $remarks = $row["remarks"];
                 } else{
-                    header("location: ../books/books.php");
+                    header("location: ../products/products.php");
                     exit();
                 }
             } else{
                 echo "Something went wrong. Please try again later.";
             }
-            
+
             mysqli_stmt_close($stmt);
         }
     } else{
-        header("location: ../books/books.php");
+        header("location: ../products/products.php");
         exit();
     }
 }
@@ -218,7 +218,7 @@ require_once "../includes/header.php";
                 <button type="submit" class="btn btn-primary" data-tooltip="Save changes">
                     <i class="fas fa-save me-1"></i>Save
                 </button>
-                <a href="../books/view_book.php?id=<?php echo $_GET["id"]; ?>" class="btn btn-secondary" data-tooltip="Back to product details">
+                <a href="../products/view_product.php?id=<?php echo $_GET["id"]; ?>" class="btn btn-secondary" data-tooltip="Back to product details">
                     <i class="fas fa-arrow-left me-1"></i>Back
                 </a>
             </div>
@@ -226,4 +226,4 @@ require_once "../includes/header.php";
     </div>
 </div>
 
-<?php require_once "../includes/footer.php"; ?> 
+<?php require_once "../includes/footer.php"; ?>

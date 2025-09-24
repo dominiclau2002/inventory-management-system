@@ -28,7 +28,13 @@ if(isset($_GET["return"]) && !empty($_GET["return"])){
         $param_id = $_GET["return"];
 
         if(mysqli_stmt_execute($stmt)){
-            header("location: " . url("books/borrows/borrow.php"));
+            // Update product status to available
+            $sql = "UPDATE products SET status = 'available' WHERE id = (SELECT product_id FROM borrows WHERE id = ?)";
+            if($stmt = mysqli_prepare($conn, $sql)){
+                mysqli_stmt_bind_param($stmt, "i", $_GET["return"]);
+                mysqli_stmt_execute($stmt);
+            }
+            header("location: " . url("products/borrows/borrow.php"));
             exit();
         }
         mysqli_stmt_close($stmt);
@@ -47,7 +53,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         mysqli_stmt_bind_param($stmt, "iis", $product_id, $user_id, $return_date);
 
         if(mysqli_stmt_execute($stmt)){
-            header("location: " . url("books/borrows/borrow.php"));
+            header("location: " . url("products/borrows/borrow.php"));
             exit();
         }
         mysqli_stmt_close($stmt);
@@ -112,7 +118,7 @@ if(isset($_GET["product_id"]) && !empty($_GET["product_id"])) {
                                 mysqli_stmt_bind_param($stmt, "i", $product_id);
                                 mysqli_stmt_execute($stmt);
                             }
-                            header("location: " . url("books/view_book.php?id=" . $product_id));
+                            header("location: " . url("products/view_product.php?id=" . $product_id));
                             exit();
                         }
                     }
@@ -120,7 +126,7 @@ if(isset($_GET["product_id"]) && !empty($_GET["product_id"])) {
             }
         }
     }
-    header("location: " . url("books/view_book.php?id=" . $product_id . "&error=1"));
+    header("location: " . url("products/view_product.php?id=" . $product_id . "&error=1"));
     exit();
 }
 
@@ -135,9 +141,14 @@ require_once "../../includes/header.php";
             <div class="col-md-8">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h4 class="mb-0">
-                            <i class="fas fa-clipboard-list me-2"></i>Products on Loan
-                        </h4>
+                        <div class="d-flex align-items-center">
+                            <a href="../../products/products.php" class="btn btn-success btn-sm me-3" data-tooltip="Back to products">
+                                <i class="fas fa-arrow-left me-1"></i>Back
+                            </a>
+                            <h4 class="mb-0">
+                                <i class="fas fa-clipboard-list me-2"></i>Products on Loan
+                            </h4>
+                        </div>
                     </div>
                     <div class="card-body">
                         <?php
@@ -168,7 +179,7 @@ require_once "../../includes/header.php";
                                 <i class="fas fa-info-circle me-2"></i>No registered users.
                             </div>
                         <?php else: ?>
-                            <form method="POST" action="<?php echo url('books/borrows/borrow.php'); ?>">
+                            <form method="POST" action="<?php echo url('products/borrows/borrow.php'); ?>">
                                 <div class="mb-3">
                                     <label class="form-label">
                                         <i class="fas fa-box me-1"></i>Product
@@ -225,5 +236,19 @@ require_once "../../includes/header.php";
                 </div>
             </div>
         </div>
+
+<style>
+    /* Make date input calendar icon visible on dark background */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+        filter: invert(1) sepia(1) hue-rotate(100deg) saturate(2);
+    }
+</style>
 
 <?php require_once "../../includes/footer.php"; ?> 

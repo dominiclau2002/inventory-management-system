@@ -1,6 +1,6 @@
 <?php
 session_start();
-$current_page = 'books';
+$current_page = 'products';
 $page_title = 'Add New Product';
 
 // Check if the user is logged in and is admin
@@ -187,7 +187,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
 
         if($success_count > 0 && empty($error_messages)){
-            header("location: ../books/books.php?success=" . $success_count);
+            header("location: ../products/products.php?success=" . $success_count);
             exit();
         }
     } else {
@@ -232,7 +232,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty($serial_number) && empty($alt_serial_number)){
         $product_name_err = $product_name_err ?: "Either Serial Number or Alt. Serial Number must be provided.";
     }
-    
+
     // Check input errors before inserting in database
     if(empty($product_name_err) && empty($category_err) && empty($main_owner_err) && empty($prototype_version_err) && empty($description_err)){
         // Prepare an insert statement
@@ -249,9 +249,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $param_prototype_version = $prototype_version;
             $param_description = $description;
             $param_remarks = $remarks;
-            
+
             if(mysqli_stmt_execute($stmt)){
-                header("location: ../books/books.php");
+                header("location: ../products/products.php");
                 exit();
             } else{
                 echo "Something went wrong. Please try again later.";
@@ -306,7 +306,7 @@ require_once "../includes/header.php";
                 <button type="submit" class="btn btn-success" data-tooltip="Save all products">
                     <i class="fas fa-save me-1"></i>Save All Products
                 </button>
-                <a href="../books/books.php" class="btn btn-secondary" data-tooltip="Back to products list">
+                <a href="../products/products.php" class="btn btn-secondary" data-tooltip="Back to products list">
                     <i class="fas fa-arrow-left me-1"></i>Back
                 </a>
             </div>
@@ -450,4 +450,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<?php require_once "../includes/footer.php"; ?> 
+<?php require_once "../includes/footer.php"; ?>

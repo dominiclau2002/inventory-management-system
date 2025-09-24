@@ -70,16 +70,6 @@ if(mysqli_query($conn, $sql)){
         mysqli_query($conn, $sql);
     }
 
-    // Check if sample products exist
-    $result = mysqli_query($conn, "SELECT id FROM products LIMIT 1");
-    if(mysqli_num_rows($result) == 0){
-        // Insert sample products
-        $sql = "INSERT INTO products (product_name, category, serial_number, alt_serial_number, main_owner, prototype_version, description, remarks) VALUES
-                ('Blackshark V3 Pro', 'Headset(PCD)', '123456', NULL, 'Kewin', 'DVT', 'Blackshark V3 Pro Headset', 'Needs repair'),
-                ('Blackwidow V4 Pro', 'Keyboard', '999999', NULL, 'Kewin', 'MP/Golden Sample', 'Blackshark v4 Pro Keyboard', 'No remarks'),
-                ('Goliathus', 'Mouse Mat', NULL, 'NOSN092215', 'Kim', 'PVT', 'Goliathus mouse mat 20 inch', 'Slight tear on surface')";
-        mysqli_query($conn, $sql);
-    }
 } else {
     die("ERROR: Could not create database. " . mysqli_error($conn));
 }

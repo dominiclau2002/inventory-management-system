@@ -1,6 +1,6 @@
 <?php
 session_start();
-$current_page = 'books';
+$current_page = 'products';
 $page_title = 'Product Details';
 
 // Check if the user is logged in
@@ -13,7 +13,7 @@ require_once "../config/db.php";
 
 // Check if product ID is provided
 if (!isset($_GET["id"]) || empty($_GET["id"])) {
-    header("location: ../books/books.php");
+    header("location: ../products/products.php");
     exit;
 }
 
@@ -30,7 +30,7 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
         if (mysqli_num_rows($result) == 1) {
             $product = mysqli_fetch_array($result);
         } else {
-            header("location: ../books/books.php");
+            header("location: ../products/products.php");
             exit;
         }
     }
@@ -69,7 +69,7 @@ require_once "../includes/header.php";
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
-                        <a href="../books/books.php" class="btn btn-success btn-sm me-3" data-tooltip="Back to products">
+                        <a href="../products/products.php" class="btn btn-success btn-sm me-3" data-tooltip="Back to products">
                             <i class="fas fa-arrow-left me-1"></i>Back
                         </a>
                         <h4 class="mb-0">
@@ -78,15 +78,15 @@ require_once "../includes/header.php";
                     </div>
                     <?php if (isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
                         <div class="btn-group">
-                            <a href="../books/edit_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-warning btn-sm" data-tooltip="Edit product">
+                            <a href="../products/edit_product.php?id=<?php echo $product["id"]; ?>" class="btn btn-warning btn-sm" data-tooltip="Edit product">
                                 <i class="fas fa-edit me-1"></i>Edit
                             </a>
-                            <a href="../books/delete_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');" data-tooltip="Delete product">
+                            <a href="../products/delete_product.php?id=<?php echo $product["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');" data-tooltip="Delete product">
                                 <i class="fas fa-trash me-1"></i>Delete
                             </a>
                         </div>
                     <?php elseif (isset($_SESSION["role"]) && $_SESSION["role"] == "user" && $product["status"] == "available"): ?>
-                        <a href="../books/borrows/borrow.php?product_id=<?php echo $product["id"]; ?>" class="btn btn-primary btn-sm" data-tooltip="Borrow product">
+                        <a href="../products/borrows/borrow.php?product_id=<?php echo $product["id"]; ?>" class="btn btn-primary btn-sm" data-tooltip="Borrow product">
                             <i class="fas fa-hand-holding me-1"></i>Borrow
                         </a>
                     <?php endif; ?>
