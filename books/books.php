@@ -14,10 +14,11 @@ require_once "../includes/header.php";
 
 // Initialize search variables
 $search_product_name = $search_category = "";
+$sort_by_availability = isset($_GET["sort_by_availability"]) ? $_GET["sort_by_availability"] : "available_first";
 $products = array();
 
 // Process search form
-if($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET["search_product_name"]) || isset($_GET["search_category"]))){
+if($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET["search_product_name"]) || isset($_GET["search_category"]) || isset($_GET["sort_by_availability"]))){
     // Sanitize inputs
     $search_product_name = isset($_GET["search_product_name"]) ? trim(htmlspecialchars($_GET["search_product_name"])) : "";
     $search_category = isset($_GET["search_category"]) ? trim(htmlspecialchars($_GET["search_category"])) : "";
@@ -41,7 +42,12 @@ if($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET["search_product_name"]) |
         $types .= "s";
     }
     
-    $sql .= " ORDER BY product_name ASC";
+    // Add sorting based on availability preference
+    if($sort_by_availability == "available_first"){
+        $sql .= " ORDER BY CASE WHEN status = 'available' THEN 0 ELSE 1 END, product_name ASC";
+    } else {
+        $sql .= " ORDER BY CASE WHEN status = 'borrowed' THEN 0 ELSE 1 END, product_name ASC";
+    }
     
     if($stmt = mysqli_prepare($conn, $sql)){
         if(!empty($params)){
@@ -59,7 +65,11 @@ if($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET["search_product_name"]) |
     }
 } else {
     // Get all products if no search parameters
-    $sql = "SELECT * FROM products ORDER BY product_name ASC";
+    if($sort_by_availability == "available_first"){
+        $sql = "SELECT * FROM products ORDER BY CASE WHEN status = 'available' THEN 0 ELSE 1 END, product_name ASC";
+    } else {
+        $sql = "SELECT * FROM products ORDER BY CASE WHEN status = 'borrowed' THEN 0 ELSE 1 END, product_name ASC";
+    }
     if($stmt = mysqli_prepare($conn, $sql)){
         if(mysqli_stmt_execute($stmt)){
             $result = mysqli_stmt_get_result($stmt);
@@ -68,6 +78,18 @@ if($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET["search_product_name"]) |
             }
         }
         mysqli_stmt_close($stmt);
+    }
+}
+
+// Separate products by availability status
+$available_products = array();
+$borrowed_products = array();
+
+foreach($products as $product) {
+    if($product['status'] == 'available') {
+        $available_products[] = $product;
+    } else {
+        $borrowed_products[] = $product;
     }
 }
 
@@ -89,7 +111,7 @@ mysqli_close($conn);
             </div>
             <div class="card-body">
                 <form method="GET" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="row g-3">
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="fas fa-box me-1"></i>Product Name
@@ -97,7 +119,7 @@ mysqli_close($conn);
                             <input type="text" name="search_product_name" class="form-control" value="<?php echo htmlspecialchars($search_product_name); ?>" data-tooltip="Search by product name">
                         </div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label class="form-label">
                                 <i class="fas fa-tag me-1"></i>Category
@@ -111,10 +133,25 @@ mysqli_close($conn);
                             </select>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-sort me-1"></i>Sort by Availability
+                            </label>
+                            <select name="sort_by_availability" class="form-select" data-tooltip="Sort by availability status">
+                                <option value="available_first" <?php echo ($sort_by_availability == "available_first") ? 'selected' : ''; ?>>
+                                    Available First
+                                </option>
+                                <option value="borrowed_first" <?php echo ($sort_by_availability == "borrowed_first") ? 'selected' : ''; ?>>
+                                    On Loan First
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-md-2">
                         <label class="form-label">&nbsp;</label>
-                        <button type="submit" class="btn btn-primary w-100" data-tooltip="Start search">
-                            <i class="fas fa-search me-1"></i>Search
+                        <button type="submit" class="btn btn-primary w-100" data-tooltip="Apply filters">
+                            <i class="fas fa-filter me-1"></i>Apply
                         </button>
                     </div>
                 </form>
@@ -155,71 +192,109 @@ mysqli_close($conn);
     </div>
 </div>
 
-<div class="row">
-    <?php if(empty($products)): ?>
+<?php if(empty($products)): ?>
+    <div class="row">
         <div class="col-12">
             <div class="alert alert-info" role="alert">
                 <i class="fas fa-info-circle me-2"></i>No products found with the specified criteria.
             </div>
         </div>
-    <?php else: ?>
-        <?php foreach($products as $product): ?>
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="fas fa-box me-2"></i><?php echo htmlspecialchars($product["product_name"]); ?>
-                        </h5>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                <i class="fas fa-tag me-1"></i>Category: <?php echo htmlspecialchars($product["category"]); ?>
-                            </small>
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                <i class="fas fa-user me-1"></i>Owner: <?php echo htmlspecialchars($product["main_owner"]); ?>
-                            </small>
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                <i class="fas fa-barcode me-1"></i>Serial: <?php echo !empty($product["serial_number"]) ? htmlspecialchars($product["serial_number"]) : (!empty($product["alt_serial_number"]) ? htmlspecialchars($product["alt_serial_number"]) : 'Not specified'); ?>
-                            </small>
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                <i class="fas fa-cog me-1"></i>Prototype Version: <?php echo htmlspecialchars($product["prototype_version"]); ?>
-                            </small>
-                        </p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                <i class="fas fa-circle-dot me-1"></i> Status:
-                                <span class="badge <?php echo $product["status"] == "available" ? "bg-success" : "bg-warning"; ?> ms-2">
-                                    <?php echo ucfirst($product["status"]); ?>
-                                </span>
-                            </small>
-                        </p>
+    </div>
+<?php else: ?>
+    <?php
+    // Determine section order based on sort preference
+    $sections = array();
+    if($sort_by_availability == "available_first") {
+        $sections = array(
+            array('title' => 'Available Products', 'products' => $available_products, 'icon' => 'fas fa-warehouse', 'badge_class' => 'bg-success'),
+            array('title' => 'Products on Loan', 'products' => $borrowed_products, 'icon' => 'fas fa-handshake', 'badge_class' => 'bg-warning')
+        );
+    } else {
+        $sections = array(
+            array('title' => 'Products on Loan', 'products' => $borrowed_products, 'icon' => 'fas fa-handshake', 'badge_class' => 'bg-warning'),
+            array('title' => 'Available Products', 'products' => $available_products, 'icon' => 'fas fa-check-circle', 'badge_class' => 'bg-success')
+        );
+    }
+    ?>
 
-                        
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="../books/view_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-primary btn-sm" data-tooltip="Product details">
-                                <i class="fas fa-info-circle me-1"></i>Details
-                            </a>
-                            <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
-                            <div class="btn-group">
-                                <a href="../books/edit_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-warning btn-sm me-2" data-tooltip="Edit product">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="../books/delete_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');" data-tooltip="Delete product">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </div>
-                            <?php endif; ?>
+    <?php foreach($sections as $section): ?>
+        <?php if(!empty($section['products'])): ?>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h4 class="mb-0">
+                                <i class="<?php echo $section['icon']; ?> me-2"></i>
+                                <?php echo $section['title']; ?>
+                                <span class="badge <?php echo $section['badge_class']; ?> ms-2">
+                                    <?php echo count($section['products']); ?> items
+                                </span>
+                            </h4>
                         </div>
                     </div>
                 </div>
             </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+
+            <div class="row mb-5">
+                <?php foreach($section['products'] as $product): ?>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="fas fa-box me-2"></i><?php echo htmlspecialchars($product["product_name"]); ?>
+                                </h5>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-tag me-1"></i>Category: <?php echo htmlspecialchars($product["category"]); ?>
+                                    </small>
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>Owner: <?php echo htmlspecialchars($product["main_owner"]); ?>
+                                    </small>
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-barcode me-1"></i>Serial: <?php echo !empty($product["serial_number"]) ? htmlspecialchars($product["serial_number"]) : (!empty($product["alt_serial_number"]) ? htmlspecialchars($product["alt_serial_number"]) : 'Not specified'); ?>
+                                    </small>
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-cog me-1"></i>Prototype Version: <?php echo htmlspecialchars($product["prototype_version"]); ?>
+                                    </small>
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-circle-dot me-1"></i> Status:
+                                        <span class="badge <?php echo $product["status"] == "available" ? "bg-success" : "bg-warning"; ?> ms-2">
+                                            <?php echo ucfirst($product["status"]); ?>
+                                        </span>
+                                    </small>
+                                </p>
+
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="../books/view_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-primary btn-sm" data-tooltip="Product details">
+                                        <i class="fas fa-info-circle me-1"></i>Details
+                                    </a>
+                                    <?php if(isset($_SESSION["role"]) && $_SESSION["role"] == "admin"): ?>
+                                    <div class="btn-group">
+                                        <a href="../books/edit_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-warning btn-sm me-2" data-tooltip="Edit product">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="../books/delete_book.php?id=<?php echo $product["id"]; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');" data-tooltip="Delete product">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 <?php require_once "../includes/footer.php"; ?> 
