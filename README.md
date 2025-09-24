@@ -1,4 +1,4 @@
-# BookHive - Inventory Management System
+# Inventory Management System
 
 A simple inventory management system built with PHP and MySQL. Helps you keep track of items, users, and borrowings with an easy-to-use interface.
 
