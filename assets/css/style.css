@@ -41,13 +41,8 @@ body {
     border-radius: 12px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(40, 54, 24, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(40, 54, 24, 0.15);
-}
 
 .card-header {
     background-color: #fff;
@@ -79,7 +74,6 @@ body {
 .btn-primary:hover {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
-    transform: translateY(-2px);
 }
 
 .btn-danger {
@@ -134,9 +128,6 @@ body {
     transition: transform 0.2s ease;
 }
 
-.table tbody tr:hover {
-    transform: scale(1.01);
-}
 
 .table tbody td {
     border: none;
@@ -228,37 +219,8 @@ body {
     }
 }
 
-/* Alap animáció minden komponensnek */
-.card, .table, .list-group, .alert {
-    animation: fadeIn 0.4s ease-out;
-}
 
-/* Késleltetett animáció a táblázat soroknak */
-.table tbody tr {
-    opacity: 0;
-    animation: fadeIn 0.3s ease-out forwards;
-}
 
-.table tbody tr:nth-child(1) { animation-delay: 0.1s; }
-.table tbody tr:nth-child(2) { animation-delay: 0.2s; }
-.table tbody tr:nth-child(3) { animation-delay: 0.3s; }
-.table tbody tr:nth-child(4) { animation-delay: 0.4s; }
-.table tbody tr:nth-child(5) { animation-delay: 0.5s; }
-
-/* Késleltetett animáció a kártya elemeknek grid-ben */
-.row > [class*="col-"] {
-    opacity: 0;
-    animation: fadeIn 0.3s ease-out forwards;
-}
-
-/* Két oszlopos grid (kezdőlap) */
-.row > [class*="col-md-6"]:nth-child(2n+1) { animation-delay: 0.1s; }
-.row > [class*="col-md-6"]:nth-child(2n+2) { animation-delay: 0.2s; }
-
-/* Három oszlopos grid (könyvek oldal) */
-.row > [class*="col-lg-4"]:nth-child(3n+1) { animation-delay: 0.1s; }
-.row > [class*="col-lg-4"]:nth-child(3n+2) { animation-delay: 0.2s; }
-.row > [class*="col-lg-4"]:nth-child(3n+3) { animation-delay: 0.3s; }
 
 @keyframes fadeIn {
     from {

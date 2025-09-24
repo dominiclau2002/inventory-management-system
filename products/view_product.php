@@ -86,7 +86,7 @@ require_once "../includes/header.php";
                             </a>
                         </div>
                     <?php elseif (isset($_SESSION["role"]) && $_SESSION["role"] == "user" && $product["status"] == "available"): ?>
-                        <a href="../products/borrows/borrow.php?product_id=<?php echo $product["id"]; ?>" class="btn btn-primary btn-sm" data-tooltip="Borrow product">
+                        <a href="../products/borrows/borrow.php?product_id=<?php echo $product["id"]; ?>" class="btn btn-info btn-sm" data-tooltip="Borrow product">
                             <i class="fas fa-hand-holding me-1"></i>Borrow
                         </a>
                     <?php endif; ?>

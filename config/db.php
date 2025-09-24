@@ -82,4 +82,7 @@ $conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 if($conn === false){
     die("ERROR: Could not connect to database. " . mysqli_connect_error());
 }
+
+// Set MySQL timezone to Singapore Time
+mysqli_query($conn, "SET time_zone = '+08:00'");
 ?> 

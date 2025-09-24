@@ -4,6 +4,9 @@
  * Handles URLs, paths, and environment-specific settings
  */
 
+// Set timezone to Singapore Time
+date_default_timezone_set('Asia/Singapore');
+
 // Base URL Configuration
 // Auto-detect if we're on localhost or production
 function get_base_url() {
