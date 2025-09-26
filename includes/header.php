@@ -71,6 +71,11 @@ $is_logged_in = isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true;
             color: #ffffff !important;
             opacity: 0.8;
         }
+
+        /* Fix dropdown appearing behind cards */
+        .dropdown-menu {
+            z-index: 9999 !important;
+        }
     </style>
 </head>
 <body>
