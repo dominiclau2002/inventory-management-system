@@ -38,6 +38,7 @@ if(mysqli_query($conn, $sql)){
         alt_serial_number VARCHAR(100) UNIQUE,
         main_owner VARCHAR(100) NOT NULL,
         prototype_version ENUM('DVT','DVT2','EVT','PVT','MP/Golden Sample') NOT NULL,
+        project_name VARCHAR(100) NOT NULL,
         description TEXT,
         status ENUM('available', 'borrowed') DEFAULT 'available',
         remarks TEXT,

@@ -32,6 +32,10 @@ function validate_product($product_data, $index) {
         $errors[] = "Product {$product_num}: Please select a prototype version.";
     }
 
+    if(empty(trim($product_data["project_name"] ?? ""))){
+        $errors[] = "Product {$product_num}: Please enter the project name.";
+    }
+
     // Description is optional - no validation needed
 
     $serial_number = trim($product_data["serial_number"] ?? "");
@@ -116,7 +120,7 @@ function check_duplicate_serials($conn, $products) {
 
 // Helper function to insert a single product
 function insert_product($conn, $product_data) {
-    $sql = "INSERT INTO products (product_name, category, serial_number, alt_serial_number, main_owner, prototype_version, description, remarks, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available')";
+    $sql = "INSERT INTO products (product_name, category, serial_number, alt_serial_number, main_owner, prototype_version, project_name, description, remarks, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available')";
 
     if($stmt = mysqli_prepare($conn, $sql)){
         $serial_number = !empty($product_data["serial_number"]) ? trim($product_data["serial_number"]) : null;
@@ -124,13 +128,14 @@ function insert_product($conn, $product_data) {
         $description = !empty($product_data["description"]) ? trim($product_data["description"]) : "";
         $remarks = !empty($product_data["remarks"]) ? trim($product_data["remarks"]) : "";
 
-        mysqli_stmt_bind_param($stmt, "ssssssss",
+        mysqli_stmt_bind_param($stmt, "sssssssss",
             $product_data["product_name"],
             $product_data["category"],
             $serial_number,
             $alt_serial_number,
             $product_data["main_owner"],
             $product_data["prototype_version"],
+            $product_data["project_name"],
             $description,
             $remarks
         );
@@ -220,6 +225,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $prototype_version = trim($_POST["prototype_version"]);
     }
 
+        // Validate project name
+    if(empty(trim($_POST["project_name"]))){
+        $project_name_err = "Please enter the project name.";
+    } else {
+        $project_name = trim($_POST["project_name"]);
+    }
+
+
     // Description is optional
     $description = trim($_POST["description"] ?? "");
 
@@ -236,10 +249,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Check input errors before inserting in database
     if(empty($product_name_err) && empty($category_err) && empty($main_owner_err) && empty($prototype_version_err) && empty($description_err)){
         // Prepare an insert statement
-        $sql = "INSERT INTO products (product_name, category, serial_number, alt_serial_number, main_owner, prototype_version, description, remarks, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'available')";
+        $sql = "INSERT INTO products (product_name, category, serial_number, alt_serial_number, main_owner, prototype_version, project_name, description, remarks, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'available')";
 
         if($stmt = mysqli_prepare($conn, $sql)){
-            mysqli_stmt_bind_param($stmt, "ssssssss", $param_product_name, $param_category, $param_serial_number, $param_alt_serial_number, $param_main_owner, $param_prototype_version, $param_description, $param_remarks);
+            mysqli_stmt_bind_param($stmt, "ssssssss", $param_product_name, $param_category, $param_serial_number, $param_alt_serial_number, $param_main_owner, $param_prototype_version, $param_project_name, $param_description, $param_remarks);
 
             $param_product_name = $product_name;
             $param_category = $category;
@@ -247,6 +260,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $param_alt_serial_number = $alt_serial_number;
             $param_main_owner = $main_owner;
             $param_prototype_version = $prototype_version;
+            $param_project_name = $project_name;
             $param_description = $description;
             $param_remarks = $remarks;
 
@@ -390,6 +404,12 @@ function getProductFormTemplate(index, data = {}) {
                             <option value="">Select Version</option>
                             ${versionOptions}
                         </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-project-diagram me-1"></i>Project Name *
+                        </label>
+                        <input type="text" name="products[${index}][project_name]" class="form-control" value="${data.project_name || ''}" required>
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">

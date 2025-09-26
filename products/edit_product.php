@@ -45,6 +45,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $prototype_version = trim($_POST["prototype_version"]);
     }
 
+    // Validate project name
+    if(empty(trim($_POST["project_name"]))){
+        $project_name_err = "Please enter the project name.";
+    } else {
+        $project_name = trim($_POST["project_name"]);
+    }
+
     // Validate description
     if(empty(trim($_POST["description"]))){
         $description_err = "Please enter the product description.";
@@ -58,12 +65,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $remarks = !empty($_POST["remarks"]) ? trim($_POST["remarks"]) : null;
 
     // Check input errors before updating in database
-    if(empty($product_name_err) && empty($category_err) && empty($main_owner_err) && empty($prototype_version_err) && empty($description_err)){
+    if(empty($product_name_err) && empty($category_err) && empty($main_owner_err) && empty($prototype_version_err) && empty($description_err) && empty($project_name_err)){
         // Prepare an update statement
-        $sql = "UPDATE products SET product_name = ?, category = ?, serial_number = ?, alt_serial_number = ?, main_owner = ?, prototype_version = ?, description = ?, remarks = ? WHERE id = ?";
+        $sql = "UPDATE products SET product_name = ?, category = ?, serial_number = ?, alt_serial_number = ?, main_owner = ?, prototype_version = ?, project_name = ?, description = ?, remarks = ? WHERE id = ?";
 
         if($stmt = mysqli_prepare($conn, $sql)){
-            mysqli_stmt_bind_param($stmt, "ssssssssi", $param_product_name, $param_category, $param_serial_number, $param_alt_serial_number, $param_main_owner, $param_prototype_version, $param_description, $param_remarks, $param_id);
+            mysqli_stmt_bind_param($stmt, "sssssssssi", $param_product_name, $param_category, $param_serial_number, $param_alt_serial_number, $param_main_owner, $param_prototype_version, $param_project_name, $param_description, $param_remarks, $param_id);
 
             $param_product_name = $product_name;
             $param_category = $category;
@@ -71,6 +78,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $param_alt_serial_number = $alt_serial_number;
             $param_main_owner = $main_owner;
             $param_prototype_version = $prototype_version;
+            $param_project_name = $project_name;
             $param_description = $description;
             $param_remarks = $remarks;
             $param_id = $_POST["id"];
@@ -109,6 +117,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     $alt_serial_number = $row["alt_serial_number"];
                     $main_owner = $row["main_owner"];
                     $prototype_version = $row["prototype_version"];
+                    $project_name = $row["project_name"];
                     $description = $row["description"];
                     $remarks = $row["remarks"];
                 } else{
@@ -197,6 +206,13 @@ require_once "../includes/header.php";
                             <?php endforeach; ?>
                         </select>
                         <div class="invalid-feedback"><?php echo $prototype_version_err; ?></div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-project-diagram me-1"></i>Project Name
+                        </label>
+                        <input type="text" name="project_name" class="form-control <?php echo (!empty($project_name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($project_name); ?>">
+                        <div class="invalid-feedback"><?php echo $project_name_err; ?></div>
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">

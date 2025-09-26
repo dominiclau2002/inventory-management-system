@@ -260,6 +260,11 @@ mysqli_close($conn);
                                 </p>
                                 <p class="card-text">
                                     <small class="text-muted">
+                                        <i class="fas fa-cog me-1"></i>Project Name: <?php echo htmlspecialchars($product["project_name"]); ?>
+                                    </small>
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">
                                         <i class="fas fa-circle-dot me-1"></i> Status:
                                         <span class="badge <?php echo $product["status"] == "available" ? "bg-success" : "bg-warning"; ?> ms-2">
                                             <?php echo ucfirst($product["status"]); ?>

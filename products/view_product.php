@@ -120,6 +120,10 @@ require_once "../includes/header.php";
                             <?php echo htmlspecialchars($product["prototype_version"]); ?>
                         </p>
                         <p>
+                            <i class="fas fa-project-diagram me-2"></i><strong>Project Name:</strong>
+                            <?php echo htmlspecialchars($product["project_name"]); ?>
+                        </p>
+                        <p>
                             <i class="fas fa-info-circle me-2"></i><strong>Status:</strong>
                             <span class="badge <?php echo $product["status"] == "available" ? "bg-success" : "bg-warning"; ?>">
                                 <?php echo ucfirst($product["status"]); ?>
