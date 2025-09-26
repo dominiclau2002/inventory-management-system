@@ -74,6 +74,7 @@ require_once "../includes/header.php";
                     <tr>
                         <th>Name</th>
                         <th>Username</th>
+                        <th>Email</th>
                         <th>Role</th>
                         <th>Actions</th>
                     </tr>
@@ -83,6 +84,7 @@ require_once "../includes/header.php";
                         <tr>
                             <td><?php echo htmlspecialchars($user["name"]); ?></td>
                             <td><?php echo htmlspecialchars($user["username"]); ?></td>
+                            <td><?php echo !empty($user["email"]) ? htmlspecialchars($user["email"]) : 'N/A'; ?></td>
                             <td>
                                 <span class="badge <?php echo $user["role"] == "admin" ? "bg-danger" : "bg-primary"; ?>">
                                     <?php echo $user["role"] == "admin" ? "Administrator" : "User"; ?>

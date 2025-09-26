@@ -34,4 +34,8 @@ cache/
 # Production configuration
 config/prod_db.php
 
+# Composer dependencies
+vendor/
+composer.lock
+
 *.md

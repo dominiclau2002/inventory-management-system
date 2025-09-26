@@ -12,8 +12,8 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
 // Import database configuration and connection string
 require_once "../config/db.php";
 
-$username = $password = $confirm_password = $name = "";
-$username_err = $password_err = $confirm_password_err = $name_err = "";
+$username = $password = $confirm_password = $name = $email = "";
+$username_err = $password_err = $confirm_password_err = $name_err = $email_err = "";
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validate name
@@ -50,6 +50,31 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             mysqli_stmt_close($stmt);
         }
     }
+
+    //validate email
+    if(empty(trim($_POST["email"]))){
+        $email_err = "Please enter your email.";
+    } else{
+        $sql = "SELECT id FROM users WHERE email = ?";
+        
+        if($stmt = mysqli_prepare($conn, $sql)){
+            mysqli_stmt_bind_param($stmt, "s", $param_email);
+            $param_email = trim(htmlspecialchars($_POST["email"]));
+            
+            if(mysqli_stmt_execute($stmt)){
+                mysqli_stmt_store_result($stmt);
+                
+                if(mysqli_stmt_num_rows($stmt) == 1){
+                    $email_err = "This email is already registered.";
+                } else{
+                    $email = $param_email;
+                }
+            } else{
+                echo "An error occurred. Please try again later.";
+            }
+            mysqli_stmt_close($stmt);
+        }
+    }
     
     // Validate password
     if(empty(trim($_POST["password"]))){
@@ -71,16 +96,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
     
     // Check input errors before inserting in database
-    if(empty($username_err) && empty($password_err) && empty($confirm_password_err) && empty($name_err)){
-        $sql = "INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, 'user')";
-         
+    if(empty($username_err) && empty($password_err) && empty($confirm_password_err) && empty($name_err) && empty($email_err)){
+        $sql = "INSERT INTO users (username, password, name, email, role) VALUES (?, ?, ?, ?, 'user')";
+
         if($stmt = mysqli_prepare($conn, $sql)){ // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "sss", $param_username, $param_password, $param_name);
-         
-            
+            mysqli_stmt_bind_param($stmt, "ssss", $param_username, $param_password, $param_name, $param_email);
+
+
             $param_username = $username;
             $param_password = password_hash($password, PASSWORD_DEFAULT);
             $param_name = $name;
+            $param_email = $email;
             
             if(mysqli_stmt_execute($stmt)){
                 header("location: ../auth/login.php");
@@ -120,6 +146,13 @@ require_once "../includes/header.php";
                         <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>" data-tooltip="Choose a unique username">
                         <span class="invalid-feedback"><?php echo $username_err; ?></span>
                     </div>    
+                    <div class="form-group mb-3">
+                        <label>
+                            <i class="fas fa-envelope me-2"></i>Email
+                        </label>
+                        <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>" data-tooltip="Enter your email address">
+                        <span class="invalid-feedback"><?php echo $email_err; ?></span>
+                    </div> 
                     <div class="form-group mb-3">
                         <label>
                             <i class="fas fa-lock me-2"></i>Password
